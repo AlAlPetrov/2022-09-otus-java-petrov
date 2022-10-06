@@ -105,7 +105,7 @@ fabric.properties
 
 # Ignore Gradle project-specific cache directory
 .gradle
-/buildSrc/.gradle/
+**buildSrc/.gradle
 
 # Ignore Gradle build output directory
 build
