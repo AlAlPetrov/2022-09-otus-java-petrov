@@ -1,0 +1,28 @@
+before optimization
+4g - spend msec:13113, sec:13
+2g - spend msec:12625, sec:12
+1g - spend msec:13373, sec:13
+512m - spend msec:14612, sec:14
+384m - spend msec:15120, sec:15
+320m - spend msec:15919, sec:15
+288m - spend msec:17431, sec:17
+272m - spend msec:17145, sec:17
+271m - spend msec:17154, sec:17
+270m - Exception in thread "main" java.lang.OutOfMemoryError: Java heap space
+268m - Exception in thread "main" java.lang.OutOfMemoryError: Java heap space
+264m - Exception in thread "main" java.lang.OutOfMemoryError: Java heap space
+256m - Exception in thread "main" java.lang.OutOfMemoryError: Java heap space
+after optimization
+4g - spend msec:2667, sec:2
+2g - spend msec:2712, sec:2
+1g - spend msec:2569, sec:2
+512m - spend msec:2606, sec:2
+256m - spend msec:3295, sec:3
+128m - Exception in thread "main" java.lang.OutOfMemoryError: Java heap space
+192m - spend msec:4962, sec:4/Exception in thread "main" java.lang.OutOfMemoryError: Java heap space
+160m - Exception in thread "main" java.lang.OutOfMemoryError: Java heap space
+176m - Exception in thread "main" java.lang.OutOfMemoryError: Java heap space
+184m - Exception in thread "main" java.lang.OutOfMemoryError: Java heap space
+188m - Exception in thread "main" java.lang.OutOfMemoryError: Java heap space
+190m -Exception in thread "main" java.lang.OutOfMemoryError: Java heap space
+191m -Exception in thread "main" java.lang.OutOfMemoryError: Java heap space
