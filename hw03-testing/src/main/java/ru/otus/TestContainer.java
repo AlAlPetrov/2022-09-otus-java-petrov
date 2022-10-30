@@ -1,7 +1,7 @@
 package ru.otus;
 
 import java.lang.reflect.Method;
-import java.util.ArrayList;
+import java.util.List;
 
-public record TestContainer(ArrayList<Method> before, ArrayList<Method> after, Method test) {
+public record TestContainer(List<Method> before, List<Method> after, Method test) {
 }
