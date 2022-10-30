@@ -6,7 +6,6 @@ package ru.otus;
 import java.lang.reflect.Method;
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 /**
  *
@@ -63,7 +62,7 @@ public class Testing {
             var tests = ExtractTestsFromClass(testClass.getDeclaredMethods());
 
             for (var test: tests) {
-               Runner.Run(testClass, test);
+               Runner.run(testClass, test);
             }
         } catch (Exception e) {
             System.out.println(MessageFormat.format("Failed to process {0}: {1}",
