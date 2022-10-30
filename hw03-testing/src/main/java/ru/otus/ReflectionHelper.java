@@ -1,7 +1,6 @@
 package ru.otus;
 
 import java.lang.reflect.Method;
-import java.text.MessageFormat;
 import java.util.Arrays;
 
 
@@ -49,7 +48,7 @@ public class ReflectionHelper {
         }
     }
 
-    public static boolean TryCallMethod(Object object,
+    public static boolean tryCallMethod(Object object,
                                         Method method,
                                         Object... args) {
         try {

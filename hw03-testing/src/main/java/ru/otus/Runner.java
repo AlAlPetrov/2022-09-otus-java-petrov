@@ -29,7 +29,7 @@ public class Runner {
 
         } finally {
             for (var after : test.after()) {
-                ReflectionHelper.TryCallMethod(testInstance, after);
+                ReflectionHelper.tryCallMethod(testInstance, after);
             }
         }
     }
