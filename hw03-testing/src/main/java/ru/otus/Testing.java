@@ -3,9 +3,7 @@
  */
 package ru.otus;
 
-import java.lang.reflect.Method;
 import java.text.MessageFormat;
-import java.util.ArrayList;
 
 /**
  *
@@ -18,48 +16,12 @@ public class Testing {
     public  Testing() {
     }
 
-    private static boolean IsAnnotatedWith(Method method, Class desiredAnnotation) {
-        var annotations = method.getDeclaredAnnotations();
-        for (var annotation : annotations) {
-            if (annotation.annotationType().equals(desiredAnnotation)) {
-                return true;
-            }
-        }
-        return false;
-    }
-    private static  ArrayList<TestContainer> ExtractTestsFromClass(Method[] methods) {
-        var before = new ArrayList<Method>();
-        var after = new ArrayList<Method>();
-        var test = new ArrayList<Method>();
-        for (var method : methods) {
-            if (IsAnnotatedWith(method, ru.otus.annotations.Test.class)) {
-                test.add(method);
-            } else if (IsAnnotatedWith(method, ru.otus.annotations.Before.class)) {
-                before.add(method);
-            } else if (IsAnnotatedWith(method, ru.otus.annotations.After.class)) {
-                after.add(method);
-            }
-        };
-        
-        return ToTestContainers(before, after, test);
-    }
-
-    private static ArrayList<TestContainer> ToTestContainers(ArrayList<Method> before, ArrayList<Method> after, ArrayList<Method> tests) {
-        var testContainers = new ArrayList<TestContainer>();
-        for (var test: tests) {
-            testContainers.add(new TestContainer(before,
-                    after,
-                    test));
-        }
-        return testContainers;
-    }
-
     public static void main(String... args) {
         String testClassName =  args[0]; //"ru.otus.Testing";
 
         try {
             var testClass = Class.forName(testClassName);
-            var tests = ExtractTestsFromClass(testClass.getDeclaredMethods());
+            var tests = TestClassParser.extractTestsFromClass(testClass.getDeclaredMethods());
 
             for (var test: tests) {
                Runner.run(testClass, test);
