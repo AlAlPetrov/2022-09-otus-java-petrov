@@ -19,14 +19,14 @@ public class Agent {
                                     ProtectionDomain protectionDomain,
                                     byte[] classfileBuffer) {
                 if (className.equals(classToApplyLogs)) {
-                    return AddProxyMethod(classfileBuffer);
+                    return InjectLogging(classfileBuffer);
                 }
                 return classfileBuffer;
             }
         });
     }
 
-    private static byte[] AddProxyMethod(byte[] originalClass) {
+    private static byte[] InjectLogging(byte[] originalClass) {
         var cr = new ClassReader(originalClass);
         var cw = new ClassWriter(cr, ClassWriter.COMPUTE_FRAMES);
         ClassVisitor cv = new LogVisitor(cw);
