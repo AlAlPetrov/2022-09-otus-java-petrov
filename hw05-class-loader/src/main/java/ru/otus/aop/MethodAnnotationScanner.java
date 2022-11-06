@@ -48,7 +48,7 @@ public class MethodAnnotationScanner extends MethodVisitor {
             for (String index : parameterIndexes) {
                 var paramNumber = Integer.valueOf(index);
                 mv.visitFieldInsn(Opcodes.GETSTATIC, "java/lang/System", "out", "Ljava/io/PrintStream;");
-                mv.visitVarInsn(Opcodes.ILOAD,  paramNumber+ 1);
+                mv.visitVarInsn(Opcodes.ILOAD,  paramNumber + 1);
 
                 var handle = new Handle(
                         H_INVOKESTATIC,
