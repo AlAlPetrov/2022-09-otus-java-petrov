@@ -1,7 +1,7 @@
 package ru.otus;
 
 /*
-    java -javaagent:gradleClassLoader-0.1.jar -jar gradleClassLoader-0.1.jar
+    java -javaagent:classLoader.jar -jar classLoader.jar
 */
 
 
