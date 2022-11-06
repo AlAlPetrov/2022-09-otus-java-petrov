@@ -10,13 +10,13 @@ public class Calculator {
     }
 
     public int MultiplyByTwo(int first, int second) {
-        System.out.println("MultiplyByTwo with 2 argument has been invoked");
+        System.out.println("MultiplyByTwo with 2 arguments has been invoked");
         return first * 2;
     }
 
     @Log(fields = { "0", "2"})
     public int MultiplyByTwo(int first, int second, int third) {
-        System.out.println("MultiplyByTwo with 3 argument has been invoked");
+        System.out.println("MultiplyByTwo with 3 arguments has been invoked");
         return first * 2;
     }
 }

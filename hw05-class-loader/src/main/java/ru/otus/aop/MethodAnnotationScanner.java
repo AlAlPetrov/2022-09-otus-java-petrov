@@ -64,7 +64,7 @@ public class MethodAnnotationScanner extends MethodVisitor {
                 mv.visitInvokeDynamicInsn("makeConcatWithConstants",
                         "(I)Ljava/lang/String;",
                         handle,
-                        "logged call: "+methodName+"["+paramNumber+"]:\u0001");
+                        "executed method: "+methodName+"["+paramNumber+"]:\u0001");
 
                 mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/io/PrintStream", "println", "(Ljava/lang/String;)V", false);
             }
