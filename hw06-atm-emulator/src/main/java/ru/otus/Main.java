@@ -1,7 +1,7 @@
 package ru.otus;
 
 /*
-    java -javaagent:classLoader.jar -jar classLoader.jar
+    java -jar atm-emulator.jar
 */
 
 import ru.otus.Exceptions.CashBoxException;
