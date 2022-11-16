@@ -1,7 +1,7 @@
 package ru.otus;
 
-import ru.otus.Orders.DispenserResult;
+import ru.otus.Results.DispenserResult;
 
 public interface Printer {
-    void print(DispenserResult order);
+    void print(DispenserResult result);
 }

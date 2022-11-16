@@ -1,6 +1,6 @@
 package ru.otus;
 
-import ru.otus.Orders.DispenserResult;
+import ru.otus.Results.DispenserResult;
 
 public class ConsolePrinter implements Printer {
     @Override

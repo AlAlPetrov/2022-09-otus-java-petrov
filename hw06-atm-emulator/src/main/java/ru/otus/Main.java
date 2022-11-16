@@ -37,6 +37,6 @@ public class Main {
         atm.withdraw(6800);
         atm.withdraw(4800);
         atm.cashReport();
-        //atm.Dispense(100000); //exception expected
+        //atm.withdraw(100000); //exception expected
     }
 }

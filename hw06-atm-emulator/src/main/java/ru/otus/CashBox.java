@@ -1,7 +1,6 @@
 package ru.otus;
 
 import ru.otus.Exceptions.CashBoxException;
-import ru.otus.Orders.DispenserResult;
 
 import java.util.List;
 
@@ -9,8 +8,8 @@ public class CashBox {
     private final int maxCount = 100;
     private int banknoteValue;
     private int pendingBanknoteCount;
-    private DispenserResult order;
     private int remainingCount;
+    private Transaction transaction;
 
     public CashBox(int banknoteValue){
         this.banknoteValue = banknoteValue;
@@ -18,7 +17,7 @@ public class CashBox {
 
     private void resetPendingOperation() {
         pendingBanknoteCount = 0;
-        order = null;
+        transaction = null;
     }
     private void putBanknotes(BanknoteBatch banknoteBatch) throws CashBoxException {
         if (remainingCount + pendingBanknoteCount + banknoteBatch.count() > maxCount)
@@ -26,9 +25,9 @@ public class CashBox {
         pendingBanknoteCount = banknoteBatch.count();
     }
 
-    public boolean depositOpen(DispenserResult order, List<BanknoteBatch> banknoteBatches) throws CashBoxException {
+    public boolean depositOpen(Transaction transaction, List<BanknoteBatch> banknoteBatches) throws CashBoxException {
         resetPendingOperation();
-        this.order = order;
+        this.transaction = transaction;
         for (var banknoteBatch: banknoteBatches) {
             if (banknoteBatch.banknoteValue() == banknoteValue) {
                 putBanknotes(banknoteBatch);
@@ -37,28 +36,28 @@ public class CashBox {
         }
         return false;
     }
-    public void depositCommit(DispenserResult order) throws CashBoxException {
-        if (this.order != order)
-            throw new CashBoxException("deposit started with different order" + order);
+    public void depositCommit(Transaction transaction) throws CashBoxException {
+        if (this.transaction != transaction)
+            throw new CashBoxException("deposit started with different order" + transaction);
         remainingCount += pendingBanknoteCount;
         resetPendingOperation();
     }
 
-    public void reserve(DispenserResult order) {
+    public BanknoteBatch reserve(Transaction transaction, int amount) {
         resetPendingOperation();
-        this.order = order;
-        pendingBanknoteCount = Math.min((int)(order.getRequiredAmount() / banknoteValue), remainingCount);
-        order.addBatch(new BanknoteBatch(banknoteValue, pendingBanknoteCount));
+        this.transaction = transaction;
+        pendingBanknoteCount = Math.min((int)(amount / banknoteValue), remainingCount);
+        return new BanknoteBatch(banknoteValue, pendingBanknoteCount);
     }
 
-    public void withdraw(DispenserResult order) throws CashBoxException {
-        if (this.order != order)
-            throw new CashBoxException("reserved order differs from" + order);
+    public void withdraw(Transaction transaction) throws CashBoxException {
+        if (this.transaction != transaction)
+            throw new CashBoxException("reserved order differs from" + transaction);
         remainingCount -= pendingBanknoteCount;
         resetPendingOperation();
     }
 
-    public void cashReport(DispenserResult order) {
-        order.addBatch(new BanknoteBatch(banknoteValue, remainingCount));
+    public BanknoteBatch cashReport() {
+        return new BanknoteBatch(banknoteValue, remainingCount);
     }
 }

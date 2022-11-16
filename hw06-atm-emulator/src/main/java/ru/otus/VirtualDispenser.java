@@ -1,8 +1,10 @@
 package ru.otus;
 
-import ru.otus.Exceptions.CashBoxException;
 import ru.otus.Exceptions.DispenserException;
-import ru.otus.Orders.DispenserResult;
+import ru.otus.Results.CashReport;
+import ru.otus.Results.DepositResult;
+import ru.otus.Results.DispenserResult;
+import ru.otus.Results.WithdrawResult;
 
 import java.util.List;
 
@@ -14,36 +16,45 @@ public class VirtualDispenser implements Dispenser {
     };
 
     @Override
-    public void withdraw(DispenserResult order) throws DispenserException, CashBoxException {
+    public DispenserResult withdraw(int requestedAmount) throws RuntimeException {
+        var transaction = new Transaction();
+        var result = new WithdrawResult(requestedAmount, transaction);
         for (var cashBox :cashBoxes) {
-            cashBox.reserve(order);
+            var banknoteBatch = cashBox.reserve(transaction, requestedAmount);
+            requestedAmount -= banknoteBatch.total();
+            result.addBatch(banknoteBatch);
         }
-        if (!order.isCompleted())
+        if (requestedAmount != 0)
             throw new DispenserException("Failed to reserve requested cash");
         for (var cashBox :cashBoxes) {
-            cashBox.withdraw(order);
+            cashBox.withdraw(transaction);
         }
+        return  result;
     }
 
     @Override
-    public void deposit(DispenserResult order,
-                        List<BanknoteBatch> banknoteBatches) throws CashBoxException, DispenserException {
+    public DispenserResult deposit(List<BanknoteBatch> banknoteBatches) throws RuntimeException {
         int deposited = 0;
+        var transaction = new Transaction();
+        var result = new DepositResult(transaction);
         for (var cashBox: cashBoxes) {
-            if (cashBox.depositOpen(order, banknoteBatches))
+            if (cashBox.depositOpen(transaction, banknoteBatches))
                 deposited++;
         }
         if (deposited != banknoteBatches.size())
-            throw new DispenserException("Failed to deposite, unsupported banknote type(s) detected");
+            throw new DispenserException("Failed to deposit, unsupported banknote type(s) detected");
         for (var cashBox: cashBoxes) {
-            cashBox.depositCommit(order);
+            cashBox.depositCommit(transaction);
         }
+        return result;
     }
 
     @Override
-    public void cashReport(DispenserResult order) {
+    public DispenserResult cashReport() {
+        var report = new CashReport(new Transaction());
         for (var cashBox: cashBoxes) {
-            cashBox.cashReport(order);
+            report.addBatch(cashBox.cashReport());
         }
+        return report;
     }
 }
