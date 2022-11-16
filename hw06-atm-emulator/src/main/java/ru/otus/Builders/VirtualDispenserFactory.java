@@ -5,15 +5,15 @@ import ru.otus.*;
 import java.util.ArrayList;
 import java.util.Collections;
 
-public class DispenserBuilder implements IDispenserBuilder {
+public class VirtualDispenserFactory implements DispenserFactory {
     private Configuration configuration;
 
-    private DispenserBuilder() {
+    private VirtualDispenserFactory() {
     }
-    public DispenserBuilder(Configuration configuration) {
+    public VirtualDispenserFactory(Configuration configuration) {
         this.configuration = configuration;
     }
-    public IDispenser Build(){
+    public Dispenser build(){
         var cashBoxes = new ArrayList<CashBox>();
         var  orderedValues= configuration.banknoteValues();
         Collections.sort(orderedValues, Collections.reverseOrder());
@@ -21,6 +21,6 @@ public class DispenserBuilder implements IDispenserBuilder {
         for (var banknoteValue: orderedValues) {
             cashBoxes.add(new CashBox(banknoteValue));
         }
-        return new Dispenser(cashBoxes);
+        return new VirtualDispenser(cashBoxes);
     }
 }

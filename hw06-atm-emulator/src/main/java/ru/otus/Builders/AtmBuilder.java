@@ -5,32 +5,27 @@ import ru.otus.Configuration;
 
 public class AtmBuilder {
     private Configuration configuration;
-    private IDispenserBuilder dispenserFactory;
-    private IPrinterBuilder printerFactory;
-    private boolean withDispenser;
-    private boolean withPrinter;
+    private DispenserFactory dispenserFactory;
+    private PrinterFactory printerFactory;
+//    private boolean withDispenser;
+  //  private boolean withPrinter;
 
     private AtmBuilder(){
     };
-    public AtmBuilder(Configuration configuration,
-                      IDispenserBuilder dispenserFactory,
-                      IPrinterBuilder printerFactory) {
+    public AtmBuilder(Configuration configuration) {
         this.configuration = configuration;
+    }
+    public AtmBuilder withDispenser(DispenserFactory dispenserFactory){
         this.dispenserFactory = dispenserFactory;
+        return this;
+    }
+    public AtmBuilder withPrinter(PrinterFactory printerFactory){
         this.printerFactory = printerFactory;
-    }
-    public AtmBuilder WithDispenser(){
-        withDispenser = true;
         return this;
     }
-    public AtmBuilder WithPrinter(){
-        withPrinter = true;
-        return this;
-    }
-    public Atm Build(){
-        var dispenser = withDispenser? dispenserFactory.Build():null;
-        var printer = withPrinter? printerFactory.Build():null;
-        return new Atm(dispenser,
-                printer);
+    public Atm build(){
+        var dispenser = dispenserFactory != null ? dispenserFactory.build():null;
+        var printer = printerFactory != null ? printerFactory.build():null;
+        return new Atm(dispenser, printer);
     }
 }

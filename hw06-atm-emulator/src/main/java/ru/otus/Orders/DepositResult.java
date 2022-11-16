@@ -1,7 +1,7 @@
 package ru.otus.Orders;
 
-public class DepositeOrder extends Order {
-    public DepositeOrder() {
+public class DepositResult extends DispenserResult {
+    public DepositResult() {
         super(0);
     }
 

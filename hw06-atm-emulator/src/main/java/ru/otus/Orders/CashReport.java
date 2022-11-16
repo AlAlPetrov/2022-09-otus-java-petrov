@@ -1,7 +1,7 @@
 package ru.otus.Orders;
 
-public class CashReportOrder extends Order {
-    public CashReportOrder() {
+public class CashReport extends DispenserResult {
+    public CashReport() {
         super(0);
     }
 

@@ -2,17 +2,17 @@ package ru.otus.Builders;
 
 import ru.otus.Configuration;
 import ru.otus.ConsolePrinter;
-import ru.otus.IPrinter;
+import ru.otus.Printer;
 
-public class PrinterBuilder implements IPrinterBuilder {
+public class ConsolePrinterFactory implements PrinterFactory {
     private Configuration configuration;
 
-    private PrinterBuilder() {
+    private ConsolePrinterFactory() {
     }
-    public PrinterBuilder(Configuration configuration) {
+    public ConsolePrinterFactory(Configuration configuration) {
         this.configuration = configuration;
     }
-    public IPrinter Build(){
+    public Printer build(){
         return new ConsolePrinter();
     }
 }

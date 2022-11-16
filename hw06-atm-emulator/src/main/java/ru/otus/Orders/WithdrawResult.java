@@ -1,7 +1,7 @@
 package ru.otus.Orders;
 
-public class WithdrawOrder extends Order {
-    public WithdrawOrder(int amount) {
+public class WithdrawResult extends DispenserResult {
+    public WithdrawResult(int amount) {
         super(amount);
     }
 
