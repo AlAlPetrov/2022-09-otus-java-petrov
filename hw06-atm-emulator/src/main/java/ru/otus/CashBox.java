@@ -36,7 +36,8 @@ public class CashBox {
         }
         return false;
     }
-    public void depositCommit(Transaction transaction) throws CashBoxException {
+
+    public void depositCommit(Transaction transaction) throws RuntimeException {
         if (this.transaction != transaction)
             throw new CashBoxException("deposit started with different order" + transaction);
         remainingCount += pendingBanknoteCount;
@@ -50,7 +51,7 @@ public class CashBox {
         return new BanknoteBatch(banknoteValue, pendingBanknoteCount);
     }
 
-    public void withdraw(Transaction transaction) throws CashBoxException {
+    public void withdraw(Transaction transaction) throws RuntimeException {
         if (this.transaction != transaction)
             throw new CashBoxException("reserved order differs from" + transaction);
         remainingCount -= pendingBanknoteCount;
