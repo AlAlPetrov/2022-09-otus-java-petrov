@@ -7,8 +7,6 @@ public class AtmBuilder {
     private Configuration configuration;
     private DispenserFactory dispenserFactory;
     private PrinterFactory printerFactory;
-//    private boolean withDispenser;
-  //  private boolean withPrinter;
 
     private AtmBuilder(){
     };
