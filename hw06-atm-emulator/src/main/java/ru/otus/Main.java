@@ -15,6 +15,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public class Main {
+
     private static final List<BanknoteBatch> banknoteBatches = new ArrayList<BanknoteBatch>() {{
         add(new BanknoteBatch(100, 100));
         add(new BanknoteBatch(200, 50));

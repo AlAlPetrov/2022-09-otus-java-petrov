@@ -9,9 +9,11 @@ public class ConsolePrinterFactory implements PrinterFactory {
 
     private ConsolePrinterFactory() {
     }
+
     public ConsolePrinterFactory(Configuration configuration) {
         this.configuration = configuration;
     }
+
     public Printer build(){
         return new ConsolePrinter();
     }

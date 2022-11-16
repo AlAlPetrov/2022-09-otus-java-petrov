@@ -19,6 +19,7 @@ public class CashBox {
         pendingBanknoteCount = 0;
         transaction = null;
     }
+
     private void putBanknotes(BanknoteBatch banknoteBatch) throws CashBoxException {
         if (remainingCount + pendingBanknoteCount + banknoteBatch.count() > maxCount)
             throw new CashBoxException("banknote count must not exceed " + maxCount);

@@ -10,9 +10,11 @@ public class VirtualDispenserFactory implements DispenserFactory {
 
     private VirtualDispenserFactory() {
     }
+
     public VirtualDispenserFactory(Configuration configuration) {
         this.configuration = configuration;
     }
+
     public Dispenser build(){
         var cashBoxes = new ArrayList<CashBox>();
         var  orderedValues= configuration.banknoteValues();

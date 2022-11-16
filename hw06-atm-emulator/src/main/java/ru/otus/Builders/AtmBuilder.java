@@ -10,17 +10,21 @@ public class AtmBuilder {
 
     private AtmBuilder(){
     };
+
     public AtmBuilder(Configuration configuration) {
         this.configuration = configuration;
     }
+
     public AtmBuilder withDispenser(DispenserFactory dispenserFactory){
         this.dispenserFactory = dispenserFactory;
         return this;
     }
+
     public AtmBuilder withPrinter(PrinterFactory printerFactory){
         this.printerFactory = printerFactory;
         return this;
     }
+
     public Atm build(){
         var dispenser = dispenserFactory != null ? dispenserFactory.build():null;
         var printer = printerFactory != null ? printerFactory.build():null;

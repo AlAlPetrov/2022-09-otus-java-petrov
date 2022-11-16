@@ -10,6 +10,7 @@ public class Atm {
     private Printer printer;
 
     private Atm () {};
+
     public Atm(Dispenser dispenser,
                Printer printer) {
         this.dispenser = dispenser;
