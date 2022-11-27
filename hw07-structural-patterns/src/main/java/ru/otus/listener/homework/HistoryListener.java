@@ -21,7 +21,7 @@ public class HistoryListener implements Listener, HistoryReader {
 
             есть опасения, что Message с 1м и тем же id может несколько раз быть передан в onUpdate
             тогда надо по-другому его хранить, но метод findMessageById возвращает 1 значение т.е.,
-            видимо опасения необоснованы
+            возможно, опасения необоснованы
         */
         history.put(msg.getId(), msg.clone());
     }

@@ -85,11 +85,17 @@ public class Message {
     public String getField9() {
         return field9;
     }
-    public String getField10() { return field10; }
+    public String getField10() {
+        return field10;
+    }
 
-    public String getField11() { return field11; }
+    public String getField11() {
+        return field11;
+    }
 
-    public String getField12() { return field12; }
+    public String getField12() {
+        return field12;
+    }
 
     public ObjectForMessage getField13() { return field13; }
 
