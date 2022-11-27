@@ -36,5 +36,4 @@ task shadowClassLoader(type: Jar, dependsOn: shadowJar) {
     from zipTree(shadowJar.archiveFile)
 }
 
-
 tasks.build.dependsOn tasks.shadowClassLoader
