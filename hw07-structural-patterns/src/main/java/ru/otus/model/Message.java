@@ -1,6 +1,6 @@
 package ru.otus.model;
 
-public class Message {
+public class Message implements Cloneable {
     private final long id;
     private final String field1;
     private final String field2;
@@ -99,7 +99,7 @@ public class Message {
 
     public ObjectForMessage getField13() { return field13; }
 
-    public Message clone(){
+    public Message clone() {
         return new Message(
                 id,
                 field1,
