@@ -10,9 +10,9 @@ import ru.otus.crm.model.Client;
 import ru.otus.crm.model.Manager;
 import ru.otus.crm.service.DbServiceClientImpl;
 import ru.otus.crm.service.DbServiceManagerImpl;
+import ru.otus.jdbc.mapper.DataTemplateJdbc;
 import ru.otus.jdbc.mapper.EntityClassMetaData;
 import ru.otus.jdbc.mapper.EntitySQLMetaData;
-import ru.otus.jdbc.mapper.DataTemplateJdbc;
 
 import javax.sql.DataSource;
 
@@ -24,30 +24,29 @@ public class HomeWork {
     private static final Logger log = LoggerFactory.getLogger(HomeWork.class);
 
     public static void main(String[] args) {
-// main part
         var dataSource = new DriverManagerDataSource(URL, USER, PASSWORD);
         flywayMigrations(dataSource);
         var transactionRunner = new TransactionRunnerJdbc(dataSource);
         var dbExecutor = new DbExecutorImpl();
 
-// work with client
-        EntityClassMetaData entityClassMetaDataClient; // = new EntityClassMetaDataImpl();
-        EntitySQLMetaData entitySQLMetaDataClient = null; //= new EntitySQLMetaDataImpl(entityClassMetaDataClient);
-        var dataTemplateClient = new DataTemplateJdbc<Client>(dbExecutor, entitySQLMetaDataClient); //universal realization of  DataTemplate
+        EntityClassMetaData clientClassMetaData = new ClassMetaDataReflectionReader(Client.class);
+        EntitySQLMetaData clientSqlGenerator = new EntitySQLGenerator(clientClassMetaData);
+        var dataTemplateClient = new DataTemplateJdbc(dbExecutor, clientClassMetaData, clientSqlGenerator);
 
-// this must be here
         var dbServiceClient = new DbServiceClientImpl(transactionRunner, dataTemplateClient);
         dbServiceClient.saveClient(new Client("dbServiceFirst"));
 
         var clientSecond = dbServiceClient.saveClient(new Client("dbServiceSecond"));
+        clientSecond.setName("updated second client");
+        dbServiceClient.saveClient(clientSecond);
+
         var clientSecondSelected = dbServiceClient.getClient(clientSecond.getId())
                 .orElseThrow(() -> new RuntimeException("Client not found, id:" + clientSecond.getId()));
         log.info("clientSecondSelected:{}", clientSecondSelected);
 
-// same thing should be done to Manager class (need to create a table)
-        EntityClassMetaData entityClassMetaDataManager; // = new EntityClassMetaDataImpl();
-        EntitySQLMetaData entitySQLMetaDataManager = null; //= new EntitySQLMetaDataImpl(entityClassMetaDataManager);
-        var dataTemplateManager = new DataTemplateJdbc<Manager>(dbExecutor, entitySQLMetaDataManager);
+        EntityClassMetaData managerClassMetaData = new ClassMetaDataReflectionReader(Manager.class);
+        EntitySQLMetaData managerSqlGenerator = new EntitySQLGenerator(managerClassMetaData);
+        var dataTemplateManager = new DataTemplateJdbc(dbExecutor, managerClassMetaData, managerSqlGenerator);
 
         var dbServiceManager = new DbServiceManagerImpl(transactionRunner, dataTemplateManager);
         dbServiceManager.saveManager(new Manager("ManagerFirst"));
@@ -56,6 +55,9 @@ public class HomeWork {
         var managerSecondSelected = dbServiceManager.getManager(managerSecond.getNo())
                 .orElseThrow(() -> new RuntimeException("Manager not found, id:" + managerSecond.getNo()));
         log.info("managerSecondSelected:{}", managerSecondSelected);
+        managerSecond.setParam1("updated param");
+        dbServiceManager.saveManager(managerSecond);
+
     }
 
     private static void flywayMigrations(DataSource dataSource) {
