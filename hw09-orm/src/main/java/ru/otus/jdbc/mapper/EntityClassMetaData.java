@@ -9,7 +9,6 @@ public interface EntityClassMetaData<T> {
 
     Constructor<T> getConstructor();
 
-    @Id
     Field getIdField();
 
     List<Field> getAllFields();
