@@ -15,21 +15,20 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class DataTemplateJdbc<T> implements DataTemplate<T> {
-
-    private final DbExecutor _dbExecutor;
-    private final EntityClassMetaData _entityClassMetaData;
-    private final EntitySQLMetaData _entitySQLMetaData;
+    private final DbExecutor dbExecutor;
+    private final EntityClassMetaData entityClassMetaData;
+    private final EntitySQLMetaData entitySQLMetaData;
 
     public DataTemplateJdbc(DbExecutor dbExecutor,
                             EntityClassMetaData entityClassMetaData,
                             EntitySQLMetaData entitySQLMetaData) {
-        _dbExecutor = dbExecutor;
-        _entityClassMetaData = entityClassMetaData;
-        _entitySQLMetaData = entitySQLMetaData;
+        this.dbExecutor = dbExecutor;
+        this.entityClassMetaData = entityClassMetaData;
+        this.entitySQLMetaData = entitySQLMetaData;
     }
 
-    private Object[] getArgs(ResultSet resultSet) throws SQLException {
-        List<Field> Fields = _entityClassMetaData.getAllFields();
+    private Object[] getArgumentTypes(ResultSet resultSet) throws SQLException {
+        List<Field> Fields = entityClassMetaData.getAllFields();
         return Fields.stream()
                 .map(field -> {
                     try {
@@ -42,14 +41,20 @@ public class DataTemplateJdbc<T> implements DataTemplate<T> {
                 .toArray();
     }
 
+    private List<Object> getValues(List<Field> fields, T entity) {
+        return fields.stream()
+                .map(field -> ReflectionHelper.getFieldValue(entity, field.getName()))
+                .collect(Collectors.toList());
+    }
+
     @Override
     public Optional<T> findById(Connection connection, long id) {
-        return (Optional<T>) _dbExecutor.executeSelect(connection, _entitySQLMetaData.getSelectByIdSql(), List.of(id), rs -> {
+        return (Optional<T>) dbExecutor.executeSelect(connection, entitySQLMetaData.getSelectByIdSql(), List.of(id), rs -> {
             try {
                 if (rs.next()) {
-                    var args = getArgs(rs);
-                    var ctor = _entityClassMetaData.getConstructor();
-                    return  ctor.newInstance(args);
+                    var argumentTypes = getArgumentTypes(rs);
+                    var entityConstructor = entityClassMetaData.getConstructor();
+                    return  entityConstructor.newInstance(argumentTypes);
                 }
                 return null;
             } catch (SQLException e) {
@@ -62,13 +67,13 @@ public class DataTemplateJdbc<T> implements DataTemplate<T> {
 
     @Override
     public List<T> findAll(Connection connection) {
-        return _dbExecutor.executeSelect(connection, _entitySQLMetaData.getSelectAllSql(), Collections.emptyList(), rs -> {
+        return dbExecutor.executeSelect(connection, entitySQLMetaData.getSelectAllSql(), Collections.emptyList(), rs -> {
             try {
                 var entitiesList = new ArrayList<T>();
-                var ctor = _entityClassMetaData.getConstructor();
+                var entityConstructor = entityClassMetaData.getConstructor();
                 while (rs.next()) {
-                    var args = getArgs(rs);
-                    entitiesList.add((T)ctor.newInstance(args));
+                    var argumentTypes = getArgumentTypes(rs);
+                    entitiesList.add((T)entityConstructor.newInstance(argumentTypes));
                 }
                 return entitiesList;
             } catch (SQLException e) {
@@ -79,17 +84,11 @@ public class DataTemplateJdbc<T> implements DataTemplate<T> {
         }).orElseThrow(() -> new RuntimeException("Unexpected error"));
     }
 
-    private List<Object> getValues(List<Field> fields, T entity) {
-        return fields.stream()
-                        .map(field -> ReflectionHelper.getFieldValue(entity, field.getName()))
-                        .collect(Collectors.toList());
-    }
-
     @Override
     public long insert(Connection connection, T entity) {
         try {
-            return _dbExecutor.executeStatement(connection, _entitySQLMetaData.getInsertSql(),
-                    getValues(_entityClassMetaData.getFieldsWithoutId(), entity));
+            return dbExecutor.executeStatement(connection, entitySQLMetaData.getInsertSql(),
+                    getValues(entityClassMetaData.getFieldsWithoutId(), entity));
         } catch (Exception e) {
             throw new DataTemplateException(e);
         }
@@ -98,9 +97,10 @@ public class DataTemplateJdbc<T> implements DataTemplate<T> {
     @Override
     public void update(Connection connection, T entity) {
         try {
-            var values = getValues(_entityClassMetaData.getFieldsWithoutId(), entity);
-            values.addAll(getValues(List.of(_entityClassMetaData.getIdField()), entity));
-            _dbExecutor.executeStatement(connection, _entitySQLMetaData.getUpdateSql(),
+            var values = getValues(entityClassMetaData.getFieldsWithoutId(), entity);
+            values.addAll(getValues(List.of(entityClassMetaData.getIdField()), entity));
+
+            dbExecutor.executeStatement(connection, entitySQLMetaData.getUpdateSql(),
                     values);
         } catch (Exception e) {
             throw new DataTemplateException(e);

@@ -11,9 +11,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class ClassMetaDataReflectionReader<T> implements EntityClassMetaData {
-    private final Class<T> _classType;
-    private List<Field> _fields;
-    private Field _idField;
+    private final Class<T> classType;
+    private List<Field> fields;
+    private Field idField;
 
     private Class<?>[] getConstructorArgs() {
         var fields = getAllFields();
@@ -29,13 +29,13 @@ public class ClassMetaDataReflectionReader<T> implements EntityClassMetaData {
         for (var field: fields) {
             if (ReflectionHelper.isAnnotatedWith(field, ru.otus.annotations.Id.class)) {
                 if (idField != null) {
-                    throw new ReflectionReaderException(_classType, "contains more than one field with @Id annotation");
+                    throw new ReflectionReaderException(classType, "contains more than one field with @Id annotation");
                 }
                 idField = field;
             }
         }
         if (idField == null) {
-            throw new ReflectionReaderException(_classType, "does not have a field annotated with @Id");
+            throw new ReflectionReaderException(classType, "does not have a field annotated with @Id");
         }
 
         return idField;
@@ -51,21 +51,21 @@ public class ClassMetaDataReflectionReader<T> implements EntityClassMetaData {
     }
 
     public ClassMetaDataReflectionReader(Class<T> classType) {
-        _classType = classType;
-        _fields = readClassFields(_classType);
-        _idField = findIdField(_fields);
+        this.classType = classType;
+        fields = readClassFields(this.classType);
+        idField = findIdField(fields);
     }
 
     @Override
     public String getName() {
-        return _classType.getSimpleName();
+        return classType.getSimpleName();
     }
 
     @Override
     public Constructor getConstructor() {
         try {
             var argTypes = getConstructorArgs();
-            return _classType.getDeclaredConstructor(argTypes);
+            return classType.getDeclaredConstructor(argTypes);
         } catch (NoSuchMethodException e) {
             throw new RuntimeException(e);
         }
@@ -73,18 +73,18 @@ public class ClassMetaDataReflectionReader<T> implements EntityClassMetaData {
 
     @Override
     public Field getIdField() {
-        return _idField;
+        return idField;
     }
 
     @Override
     public List<Field> getAllFields() {
-        return _fields;
+        return fields;
     }
 
     @Override
     public List<Field> getFieldsWithoutId() {
-        return _fields.stream()
-                .filter(field -> field != _idField)
+        return fields.stream()
+                .filter(field -> field != idField)
                 .collect(Collectors.toList());
     }
 }
