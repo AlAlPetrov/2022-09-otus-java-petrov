@@ -1,5 +1,6 @@
 plugins {
     id 'java'
+    id 'com.github.johnrengelman.shadow'
 }
 
 sourceCompatibility = JavaVersion.VERSION_17
@@ -7,13 +8,22 @@ targetCompatibility = JavaVersion.VERSION_17
 
 dependencies {
     dependencies {
-        implementation project(':L18-jdbc:demo')
-
         implementation 'ch.qos.logback:logback-classic'
         implementation 'org.flywaydb:flyway-core'
+        implementation 'com.zaxxer:HikariCP'
         implementation 'org.postgresql:postgresql'
     }
 }
 
 test {
 }
+
+task shadowClassLoader(type: Jar, dependsOn: shadowJar) {
+    archiveBaseName.set('serialization')
+    manifest {
+        attributes 'Main-Class': 'ru.otus.Demo'
+    }
+    from zipTree(shadowJar.archiveFile)
+}
+
+tasks.build.dependsOn tasks.shadowClassLoader
