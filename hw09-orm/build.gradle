@@ -21,7 +21,7 @@ test {
 task shadowClassLoader(type: Jar, dependsOn: shadowJar) {
     archiveBaseName.set('serialization')
     manifest {
-        attributes 'Main-Class': 'ru.otus.Demo'
+        attributes 'Main-Class': 'ru.otus.orm'
     }
     from zipTree(shadowJar.archiveFile)
 }
