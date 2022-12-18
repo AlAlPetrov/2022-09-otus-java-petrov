@@ -11,7 +11,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class DataTemplateJdbc<T> implements DataTemplate<T> {
@@ -27,34 +26,14 @@ public class DataTemplateJdbc<T> implements DataTemplate<T> {
         this.entitySQLMetaData = entitySQLMetaData;
     }
 
-    private Object[] getArgumentTypes(ResultSet resultSet) throws SQLException {
-        List<Field> Fields = entityClassMetaData.getAllFields();
-        return Fields.stream()
-                .map(field -> {
-                    try {
-                        return resultSet.getObject(field.getName(),
-                                field.getType());
-                    } catch (SQLException e) {
-                        throw new RuntimeException(e);
-                    }
-                }).collect(Collectors.toList())
-                .toArray();
-    }
-
-    private List<Object> getValues(List<Field> fields, T entity) {
-        return fields.stream()
-                .map(field -> ReflectionHelper.getFieldValue(entity, field.getName()))
-                .collect(Collectors.toList());
-    }
-
     @Override
-    public Optional<T> findById(Connection connection, long id) {
-        return (Optional<T>) dbExecutor.executeSelect(connection, entitySQLMetaData.getSelectByIdSql(), List.of(id), rs -> {
+    public T findById(Connection connection, long id) {
+        return dbExecutor.executeSelect(connection, entitySQLMetaData.getSelectByIdSql(), List.of(id), rs -> {
             try {
                 if (rs.next()) {
                     var argumentTypes = getArgumentTypes(rs);
                     var entityConstructor = entityClassMetaData.getConstructor();
-                    return  entityConstructor.newInstance(argumentTypes);
+                    return  (T)entityConstructor.newInstance(argumentTypes);
                 }
                 return null;
             } catch (SQLException e) {
@@ -62,7 +41,7 @@ public class DataTemplateJdbc<T> implements DataTemplate<T> {
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
-        });
+        }).orElseThrow(() -> new RuntimeException("Unexpected error"));
     }
 
     @Override
@@ -105,5 +84,25 @@ public class DataTemplateJdbc<T> implements DataTemplate<T> {
         } catch (Exception e) {
             throw new DataTemplateException(e);
         }
+    }
+
+    private Object[] getArgumentTypes(ResultSet resultSet) throws SQLException {
+        List<Field> Fields = entityClassMetaData.getAllFields();
+        return Fields.stream()
+                .map(field -> {
+                    try {
+                        return resultSet.getObject(field.getName(),
+                                field.getType());
+                    } catch (SQLException e) {
+                        throw new RuntimeException(e);
+                    }
+                }).collect(Collectors.toList())
+                .toArray();
+    }
+
+    private List<Object> getValues(List<Field> fields, T entity) {
+        return fields.stream()
+                .map(field -> ReflectionHelper.getFieldValue(entity, field.getName()))
+                .collect(Collectors.toList());
     }
 }
