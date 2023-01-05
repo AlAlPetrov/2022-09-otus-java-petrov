@@ -27,9 +27,9 @@ CREATE TABLE IF NOT EXISTS phone
 (
     id bigint NOT NULL,
     "number" character varying(255) COLLATE pg_catalog."default",
-    client bigint,
+    client_id bigint,
     CONSTRAINT phone_pkey PRIMARY KEY (id),
-    CONSTRAINT fkqm6tehjpnsdta8v8ns2rvb476 FOREIGN KEY (client)
+    CONSTRAINT fkqm6tehjpnsdta8v8ns2rvb476 FOREIGN KEY (client_id)
         REFERENCES public.client (id) MATCH SIMPLE
         ON UPDATE NO ACTION
         ON DELETE NO ACTION

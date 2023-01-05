@@ -33,7 +33,6 @@ public class DbServiceDemo {
                 Client.class,
                 Address.class,
                 Phone.class);
-
         var transactionManager = new TransactionManagerHibernate(sessionFactory);
 ///
         var clientTemplate = new DataTemplateHibernate<>(Client.class);
@@ -44,8 +43,7 @@ public class DbServiceDemo {
                 new Address(null, "test street"),
                 List.of(new Phone(null, "1(234)1234567"), new Phone(null, "9(876)9876543"))));
 
-        var clientSelected = dbServiceClient.getClient(client.getId())
+        var insertedClient = dbServiceClient.getClient(client.getId())
                 .orElseThrow(() -> new RuntimeException("Client not found, id:" + client.getId()));
-        var address = clientSelected.getAddress();
     }
 }

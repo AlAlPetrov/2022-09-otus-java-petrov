@@ -4,13 +4,16 @@ package ru.otus.crm.model;
 import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Table(name = "client")
 @Getter
+@Setter
 @NoArgsConstructor
 @Data
 public class Client implements Cloneable {
@@ -29,8 +32,9 @@ public class Client implements Cloneable {
     private Address address;
 
     @OneToMany(fetch = FetchType.LAZY,
-            cascade = CascadeType.ALL)
-    @JoinColumn(name = "client", referencedColumnName = "id")
+            cascade = CascadeType.ALL,
+            mappedBy = "client",
+            orphanRemoval = true)
     private List<Phone> phones;
 
     public Client(String name) {
@@ -47,7 +51,11 @@ public class Client implements Cloneable {
         this.id = id;
         this.name = name;
         this.address = address;
-        this.phones = phones;
+        this.phones = new ArrayList<>();
+        for (var phone: phones) {
+            phone.setClient(this);
+            this.phones.add(phone);
+        };
     }
 
     @Override
