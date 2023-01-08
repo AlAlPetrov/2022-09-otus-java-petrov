@@ -1,5 +1,6 @@
 package ru.otus.crm.model;
 
+import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
@@ -9,6 +10,7 @@ import javax.persistence.*;
 @Table(name = "phone")
 @Setter
 @NoArgsConstructor
+@Data
 public class Phone {
     @Id
     @SequenceGenerator(name = "idgen", initialValue = 1, allocationSize = 1, sequenceName = "phone_seq")

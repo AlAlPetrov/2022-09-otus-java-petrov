@@ -1,0 +1,137 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <style>
+/* Style the button that is used to open and close the collapsible content */
+.collapsible {
+background-color: #eee;
+color: #444;
+cursor: pointer;
+padding: 18px;
+width: 100%;
+border: none;
+text-align: left;
+outline: none;
+font-size: 15px;
+}
+
+/* Add a background color to the button if it is clicked on (add the .active class with JS), and when you move the mouse over it (hover) */
+.active, .collapsible:hover {
+background-color: #ccc;
+}
+
+/* Style the collapsible content. Note: hidden by default */
+.content {
+padding: 0 18px;
+display: none;
+overflow: hidden;
+background-color: #f1f1f1;
+}
+
+.collapsible:after {
+  content: '\02795'; /* Unicode character for "plus" sign (+) */
+  font-size: 13px;
+  color: white;
+  float: right;
+  margin-left: 5px;
+}
+
+.active:after {
+  content: "\2796"; /* Unicode character for "minus" sign (-) */
+}
+
+table, td, th {
+  border: 1px solid black;
+  border-collapse: collapse;
+}
+
+tr td:last-child {
+    width: 1%;
+    white-space: nowrap;
+}
+</style>
+
+    <title>Пользователи</title>
+    <script>
+        function addClient() {
+            const clientNameTextBox = document.getElementById('clientNameTextBox');
+            const clientAddressTextBox = document.getElementById('clientAddressTextBox');
+            const clientPhoneTextBox = document.getElementById('clientPhoneTextBox');
+            fetch('api/client/',
+                    {
+                        method: 'POST',
+                        body: JSON.stringify(
+                            {
+                                "name": clientNameTextBox.value,
+                                "address": {
+                                    "street": clientAddressTextBox.value
+                                },
+                                "phones": [
+                                    {
+                                        "number": clientPhoneTextBox.value
+                                    }
+                                ]
+                            })
+                     })
+            location.reload()
+        }
+    </script>
+</head>
+
+<body>
+<input type="text" id = "clientNameTextBox" value="test client" placeholder="Введите имя клиента">
+<input type="text" id = "clientAddressTextBox" value="test street" placeholder="Введите адрес клиента">
+<input type="text" id = "clientPhoneTextBox" value="+7(123)4567890" placeholder="Введите телефон клиента">
+<button onclick="addClient()">Создать клиента</button>
+
+<h4>Клиенты:</h4>
+<table style="width: 50%">
+    <thead>
+        <tr>
+            <td>Id</td>
+            <td>Имя</td>
+            <td>Адрес</td>
+            <td>Телефоны</td>
+        </tr>
+    </thead>
+    <tbody>
+        <#list clients as client>
+        <tr>
+            <td>${client.id}</td>
+            <td>${client.name}</td>
+            <td>${client.address.street}</td>
+            <td>
+                <table>
+                <tbody>
+                <#list client.phones as phone>
+                <tr>
+                    <td>${phone.number}</td>
+                </tr>
+                </#list>
+                </tbody>
+                </table>
+            </td>
+        </tr>
+        </#list>
+    </tbody>
+</table>
+
+<script>
+var coll = document.getElementsByClassName("collapsible");
+var i;
+
+for (i = 0; i < coll.length; i++) {
+  coll[i].addEventListener("click", function() {
+    this.classList.toggle("active");
+    var content = this.nextElementSibling;
+    if (content.style.maxHeight){
+      content.style.maxHeight = null;
+    } else {
+      content.style.maxHeight = content.scrollHeight + "px";
+    }
+  });
+}
+</script>
+
+</body>
+</html>

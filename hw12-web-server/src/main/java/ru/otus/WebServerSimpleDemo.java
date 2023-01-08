@@ -2,11 +2,26 @@ package ru.otus;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import org.hibernate.cfg.Configuration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import ru.otus.core.repository.DataTemplateHibernate;
+import ru.otus.core.repository.HibernateUtils;
+import ru.otus.core.sessionmanager.TransactionManagerHibernate;
+import ru.otus.crm.dbmigrations.MigrationsExecutorFlyway;
+import ru.otus.crm.model.Address;
+import ru.otus.crm.model.Client;
+import ru.otus.crm.model.Phone;
+import ru.otus.crm.service.DBServiceClient;
+import ru.otus.crm.service.DbServiceClientImpl;
 import ru.otus.dao.InMemoryUserDao;
 import ru.otus.dao.UserDao;
 import ru.otus.server.UsersWebServer;
 import ru.otus.server.UsersWebServerSimple;
-import ru.otus.services.*;
+import ru.otus.services.TemplateProcessor;
+import ru.otus.services.TemplateProcessorImpl;
+
+import java.util.List;
 
 /*
     Полезные для демо ссылки
@@ -24,15 +39,54 @@ public class WebServerSimpleDemo {
     private static final int WEB_SERVER_PORT = 8080;
     private static final String TEMPLATES_DIR = "/templates/";
 
+    private static final Logger log = LoggerFactory.getLogger(WebServerSimpleDemo.class);
+
+    private static final String HIBERNATE_CFG_FILE = "hibernate.cfg.xml";
+
+
     public static void main(String[] args) throws Exception {
+        var configuration = new Configuration().configure(HIBERNATE_CFG_FILE);
+        applyDatabaseMigrations(configuration);
+
         UserDao userDao = new InMemoryUserDao();
         Gson gson = new GsonBuilder().serializeNulls().setPrettyPrinting().create();
         TemplateProcessor templateProcessor = new TemplateProcessorImpl(TEMPLATES_DIR);
 
-        UsersWebServer usersWebServer = new UsersWebServerSimple(WEB_SERVER_PORT, userDao,
-                gson, templateProcessor);
+        var clientService = createClientService(configuration);
+
+        UsersWebServer usersWebServer = new UsersWebServerSimple(
+                WEB_SERVER_PORT,
+                gson,
+                templateProcessor,
+                clientService);
+
+        var client = clientService.saveClient(new Client(null,
+                "test client name",
+                new Address(null, "test street"),
+                List.of(new Phone(null, "1(234)1234567"), new Phone(null, "9(876)9876543"))));
+
+        var insertedClient = clientService.getClient(client.getId())
+                .orElseThrow(() -> new RuntimeException("Client not found, id:" + client.getId()));
 
         usersWebServer.start();
         usersWebServer.join();
+    }
+
+    private static DBServiceClient createClientService(Configuration configuration) {
+        var sessionFactory = HibernateUtils.buildSessionFactory(configuration,
+                Client.class,
+                Address.class,
+                Phone.class);
+        var transactionManager = new TransactionManagerHibernate(sessionFactory);
+        var clientTemplate = new DataTemplateHibernate<>(Client.class);
+        return new DbServiceClientImpl(transactionManager, clientTemplate);
+    }
+
+    private static void applyDatabaseMigrations(Configuration configuration) {
+        var dbUrl = configuration.getProperty("hibernate.connection.url");
+        var dbUserName = configuration.getProperty("hibernate.connection.username");
+        var dbPassword = configuration.getProperty("hibernate.connection.password");
+
+        new MigrationsExecutorFlyway(dbUrl, dbUserName, dbPassword).executeMigrations();
     }
 }
