@@ -10,7 +10,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-
 public class ClientsServlet extends HttpServlet {
 
     private static final String CLIENTS_PAGE_TEMPLATE = "clients.html";

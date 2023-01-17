@@ -55,7 +55,6 @@ public class ClientsWebServerSimple implements ClientsWebServer {
     }
 
     private Server initContext() {
-
         ResourceHandler resourceHandler = createResourceHandler();
         ServletContextHandler servletContextHandler = createServletContextHandler();
 

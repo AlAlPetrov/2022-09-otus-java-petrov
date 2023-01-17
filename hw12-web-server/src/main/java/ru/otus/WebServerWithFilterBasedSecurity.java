@@ -7,14 +7,13 @@ import ru.otus.core.repository.DataTemplateHibernate;
 import ru.otus.core.repository.HibernateUtils;
 import ru.otus.core.sessionmanager.TransactionManagerHibernate;
 import ru.otus.crm.dbmigrations.MigrationsExecutorFlyway;
-import ru.otus.model.Address;
-import ru.otus.model.Client;
-import ru.otus.model.Phone;
 import ru.otus.crm.service.DBServiceClient;
 import ru.otus.crm.service.DbServiceClientImpl;
 import ru.otus.dao.InMemoryUserDao;
 import ru.otus.dao.UserDao;
-import ru.otus.server.ClientsWebServer;
+import ru.otus.model.Address;
+import ru.otus.model.Client;
+import ru.otus.model.Phone;
 import ru.otus.server.ClientsWebServerWithFilterBasedSecurity;
 import ru.otus.services.TemplateProcessor;
 import ru.otus.services.TemplateProcessorImpl;
@@ -43,8 +42,11 @@ public class WebServerWithFilterBasedSecurity {
 
         var clientService = createClientService(configuration);
 
-        ClientsWebServer usersWebServer = new ClientsWebServerWithFilterBasedSecurity(WEB_SERVER_PORT,
-                authService, gson, templateProcessor, clientService);
+        var usersWebServer = new ClientsWebServerWithFilterBasedSecurity(WEB_SERVER_PORT,
+                authService,
+                gson,
+                templateProcessor,
+                clientService);
 
         usersWebServer.start();
         usersWebServer.join();

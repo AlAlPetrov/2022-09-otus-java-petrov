@@ -16,7 +16,6 @@ public class TemplateProcessorImpl implements TemplateProcessor {
 
     public TemplateProcessorImpl(String templatesDir) throws IOException {
         configuration = new Configuration(Configuration.VERSION_2_3_30);
-        //configuration.setDirectoryForTemplateLoading(new File(templatesDir));  // for directory
         configuration.setClassForTemplateLoading(this.getClass(), templatesDir); // for resource
         configuration.setDefaultEncoding("UTF-8");
     }
