@@ -60,6 +60,12 @@ tr td:last-child {
             fetch('api/client/',
                     {
                         method: 'POST',
+                        cache: 'no-cache',
+                        redirect: 'follow',
+                        window: window,
+                        headers: {
+                          'Content-Type': 'application/json'
+                        },
                         body: JSON.stringify(
                             {
                                 "name": clientNameTextBox.value,
@@ -72,8 +78,11 @@ tr td:last-child {
                                     }
                                 ]
                             })
-                     })
-            location.reload()
+                     }).then(response => {
+                            if (response.redirected) {
+                                window.location.href = response.url;
+                    }
+    })
         }
     </script>
 </head>
@@ -115,23 +124,5 @@ tr td:last-child {
         </#list>
     </tbody>
 </table>
-
-<script>
-var coll = document.getElementsByClassName("collapsible");
-var i;
-
-for (i = 0; i < coll.length; i++) {
-  coll[i].addEventListener("click", function() {
-    this.classList.toggle("active");
-    var content = this.nextElementSibling;
-    if (content.style.maxHeight){
-      content.style.maxHeight = null;
-    } else {
-      content.style.maxHeight = content.scrollHeight + "px";
-    }
-  });
-}
-</script>
-
 </body>
 </html>

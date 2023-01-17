@@ -13,14 +13,14 @@ import ru.otus.servlet.LoginServlet;
 
 import java.util.Arrays;
 
-public class UsersWebServerWithFilterBasedSecurity extends UsersWebServerSimple {
+public class ClientsWebServerWithFilterBasedSecurity extends ClientsWebServerSimple {
     private final UserAuthService authService;
 
-    public UsersWebServerWithFilterBasedSecurity(int port,
-                                                 UserAuthService authService,
-                                                 Gson gson,
-                                                 TemplateProcessor templateProcessor,
-                                                 DBServiceClient clientService) {
+    public ClientsWebServerWithFilterBasedSecurity(int port,
+                                                   UserAuthService authService,
+                                                   Gson gson,
+                                                   TemplateProcessor templateProcessor,
+                                                   DBServiceClient clientService) {
         super(port,
                 gson,
                 templateProcessor,

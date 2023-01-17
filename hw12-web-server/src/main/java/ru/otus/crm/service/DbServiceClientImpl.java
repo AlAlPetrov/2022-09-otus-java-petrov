@@ -3,7 +3,7 @@ package ru.otus.crm.service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.otus.core.repository.DataTemplate;
-import ru.otus.crm.model.Client;
+import ru.otus.model.Client;
 import ru.otus.core.sessionmanager.TransactionManager;
 
 import java.util.List;

@@ -14,7 +14,7 @@ import ru.otus.servlet.ClientsApiServlet;
 import ru.otus.servlet.ClientsServlet;
 
 
-public class UsersWebServerSimple implements UsersWebServer {
+public class ClientsWebServerSimple implements ClientsWebServer {
     private static final String START_PAGE_NAME = "index.html";
     private static final String COMMON_RESOURCES_DIR = "static";
 
@@ -26,10 +26,10 @@ public class UsersWebServerSimple implements UsersWebServer {
 
     protected final TemplateProcessor templateProcessor;
 
-    public <clientService> UsersWebServerSimple(int port,
-                                                Gson gson,
-                                                TemplateProcessor templateProcessor,
-                                                DBServiceClient clientService) {
+    public <clientService> ClientsWebServerSimple(int port,
+                                                  Gson gson,
+                                                  TemplateProcessor templateProcessor,
+                                                  DBServiceClient clientService) {
         this.gson = gson;
         this.templateProcessor = templateProcessor;
         this.clientService = clientService;
