@@ -20,14 +20,12 @@ public class ClientsApiServlet extends HttpServlet {
         this.clientService = clientService;
         this.gson = gson;
     }
-
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         var inputStream = request.getInputStream();
         var client = gson.fromJson(new InputStreamReader(inputStream), Client.class);
         clientService.saveClient(client);
         response.setContentType("text/html");
-        response.sendRedirect("/clients");
     }
 
     @Override

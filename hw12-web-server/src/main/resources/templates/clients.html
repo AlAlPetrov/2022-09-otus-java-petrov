@@ -40,11 +40,10 @@
                                     }
                                 ]
                             })
-                     }).then(response => {
-                            if (response.redirected) {
-                                window.location.href = response.url;
-                    }
-    })
+                     })
+                     .then(response => {
+                        window.location.href = '/clients';
+                     })
         }
     </script>
 </head>
