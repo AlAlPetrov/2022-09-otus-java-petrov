@@ -26,10 +26,10 @@ public class ClientsWebServerSimple implements ClientsWebServer {
 
     protected final TemplateProcessor templateProcessor;
 
-    public <clientService> ClientsWebServerSimple(int port,
-                                                  Gson gson,
-                                                  TemplateProcessor templateProcessor,
-                                                  DBServiceClient clientService) {
+    public ClientsWebServerSimple(int port,
+                                  Gson gson,
+                                  TemplateProcessor templateProcessor,
+                                  DBServiceClient clientService) {
         this.gson = gson;
         this.templateProcessor = templateProcessor;
         this.clientService = clientService;
