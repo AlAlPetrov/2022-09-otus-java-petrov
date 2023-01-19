@@ -4,8 +4,8 @@ import ru.otus.appcontainer.api.AppComponentsContainer;
 import ru.otus.appcontainer.api.AppComponentsContainerConfig;
 import ru.otus.exceptions.IocContainerException;
 import ru.otus.ioc.AnnotatedMethod;
-import ru.otus.ioc.ConfigurationMetadataReader;
-import ru.otus.ioc.ConfigurationReader;
+import ru.otus.ioc.ComponentConfigurationMetadataReader;
+import ru.otus.ioc.ComponentConfigurationReflectionReader;
 import ru.otus.ioc.ReflectionHelper;
 
 import java.util.*;
@@ -14,10 +14,10 @@ public class AppComponentsContainerImpl implements AppComponentsContainer {
 
     private final List<Object> appComponents = new ArrayList<>();
     private final Map<String, Object> appComponentsByName = new HashMap<>();
-    private ConfigurationMetadataReader configurationReader;
+    private ComponentConfigurationMetadataReader configurationReader;
 
     public AppComponentsContainerImpl(Class<?> initialConfigClass) {
-        configurationReader = new ConfigurationReader(initialConfigClass);
+        configurationReader = new ComponentConfigurationReflectionReader(initialConfigClass);
 
         processConfig(initialConfigClass);
     }

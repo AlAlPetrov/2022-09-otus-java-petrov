@@ -8,12 +8,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class ConfigurationReader<T> implements ConfigurationMetadataReader{
+public class ComponentConfigurationReflectionReader<T> implements ComponentConfigurationMetadataReader {
     private final Class<T> classType;
 
     private List<AnnotatedMethod> annotatedMethods;
 
-    public ConfigurationReader(Class<T> classType) {
+    public ComponentConfigurationReflectionReader(Class<T> classType) {
         this.classType = classType;
         var methods = readConfigurationMethods(this.classType);
         annotatedMethods = applyAnnotation(methods);
