@@ -9,7 +9,6 @@ import ru.otus.model.Client;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.PrintWriter;
 
 public class ClientsApiServlet extends HttpServlet {
 
@@ -26,17 +25,5 @@ public class ClientsApiServlet extends HttpServlet {
         var client = gson.fromJson(new InputStreamReader(inputStream), Client.class);
         clientService.saveClient(client);
         response.setContentType("text/html");
-    }
-
-    @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        response.setContentType("text/html");
-        var clients = clientService.findAll();
-
-        PrintWriter out = response.getWriter();
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
-        out.print(gson.toJson(clients));
-        out.flush();
     }
 }
