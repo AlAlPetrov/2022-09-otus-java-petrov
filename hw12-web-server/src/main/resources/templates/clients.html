@@ -1,0 +1,89 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <style>
+        table, td, th {
+          border: 1px solid black;
+          border-collapse: collapse;
+        }
+
+        tr td:last-child {
+            width: 1%;
+            white-space: nowrap;
+        }
+    </style>
+
+    <title>Пользователи</title>
+    <script>
+        function addClient() {
+            const clientNameTextBox = document.getElementById('clientNameTextBox');
+            const clientAddressTextBox = document.getElementById('clientAddressTextBox');
+            const clientPhoneTextBox = document.getElementById('clientPhoneTextBox');
+            fetch('api/client/',
+                    {
+                        method: 'POST',
+                        cache: 'no-cache',
+                        redirect: 'follow',
+                        window: window,
+                        headers: {
+                          'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(
+                            {
+                                "name": clientNameTextBox.value,
+                                "address": {
+                                    "street": clientAddressTextBox.value
+                                },
+                                "phones": [
+                                    {
+                                        "number": clientPhoneTextBox.value
+                                    }
+                                ]
+                            })
+                     })
+                     .then(response => {
+                        window.location.href = '/clients';
+                     })
+        }
+    </script>
+</head>
+
+<body>
+<input type="text" id = "clientNameTextBox" value="test client" placeholder="Введите имя клиента">
+<input type="text" id = "clientAddressTextBox" value="test street" placeholder="Введите адрес клиента">
+<input type="text" id = "clientPhoneTextBox" value="+7(123)4567890" placeholder="Введите телефон клиента">
+<button onclick="addClient()">Создать клиента</button>
+
+<h4>Клиенты:</h4>
+<table style="width: 50%">
+    <thead>
+        <tr>
+            <td>Id</td>
+            <td>Имя</td>
+            <td>Адрес</td>
+            <td>Телефоны</td>
+        </tr>
+    </thead>
+    <tbody>
+        <#list clients as client>
+        <tr>
+            <td>${client.id}</td>
+            <td>${client.name}</td>
+            <td>${client.address.street}</td>
+            <td>
+                <table cellspacing="0" cellpadding="0">
+                <tbody>
+                <#list client.phones as phone>
+                <tr>
+                    <td>${phone.number}</td>
+                </tr>
+                </#list>
+                </tbody>
+                </table>
+            </td>
+        </tr>
+        </#list>
+    </tbody>
+</table>
+</body>
+</html>
