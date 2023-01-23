@@ -26,8 +26,6 @@ public class AppComponentsContainerImpl implements AppComponentsContainer {
     public <C> C getAppComponent(Class<C> componentClass) {
         C appComponent = null;
         for (var component: appComponents) {
-            var cass = component.getClass();
-
             if (componentClass.isAssignableFrom(component.getClass())){
                 if (appComponent != null) {
                     throw new IocContainerException("component of type" + componentClass.getName() + " has multiple instances");
