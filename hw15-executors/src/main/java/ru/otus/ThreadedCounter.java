@@ -8,14 +8,14 @@ public class ThreadedCounter {
     private String last = "second";
 
     private synchronized void action(String thread) {
-        Integer counter = 1;
+        int counter = 1;
         int addon = 1;
         while(!Thread.currentThread().isInterrupted()) {
             try {
                 while (last.equals(thread)) {
                     this.wait();
                 }
-                logger.info(counter.toString());
+                logger.info(Integer.toString(counter));
 
                 counter = counter + addon;
                 if (counter == 10)
