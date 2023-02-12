@@ -19,15 +19,15 @@ class MeasurementTimeComparator implements Comparator<SensorData> {
 
 public class SensorDataProcessorBuffered implements SensorDataProcessor {
     private static final Logger log = LoggerFactory.getLogger(SensorDataProcessorBuffered.class);
-    private final int defaultInitialCapacity = 11;
     private final int bufferSize;
     private final SensorDataBufferedWriter writer;
-    private PriorityBlockingQueue<SensorData> dataBuffer = new PriorityBlockingQueue<>(defaultInitialCapacity,
-            new MeasurementTimeComparator());
+    private final  PriorityBlockingQueue<SensorData> dataBuffer;
 
     public SensorDataProcessorBuffered(int bufferSize, SensorDataBufferedWriter writer) {
         this.bufferSize = bufferSize;
         this.writer = writer;
+        this.dataBuffer  = new PriorityBlockingQueue<>(bufferSize,
+                                                new MeasurementTimeComparator());
     }
 
     @Override

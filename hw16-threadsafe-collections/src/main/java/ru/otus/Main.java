@@ -44,7 +44,7 @@ public class Main {
         fakeSensorDataGenerator.start();
         sensorDataProcessingFlow.startProcessing();
 
-        TimeUnit.SECONDS.sleep(10);
+        TimeUnit.SECONDS.sleep(1);
 
         fakeSensorDataGenerator.stop();
         sensorDataProcessingFlow.stopProcessing();
