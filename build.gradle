@@ -21,6 +21,10 @@ allprojects {
             }
             dependency "com.google.guava:guava:${Versions.guava}"
             dependency "org.ow2.asm:asm-commons:${Versions.asm}"
+
+            dependency("io.grpc:grpc-netty:${Versions.grpc}")
+            dependency("io.grpc:grpc-protobuf:${Versions.grpc}")
+            dependency("io.grpc:grpc-stub:${Versions.grpc}")
         }
     }
 
