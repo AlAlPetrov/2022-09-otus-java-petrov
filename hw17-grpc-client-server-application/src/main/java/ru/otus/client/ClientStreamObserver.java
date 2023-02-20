@@ -7,10 +7,10 @@ public class ClientStreamObserver implements StreamObserver<GetNumbersInRangeRes
     private long lastValue;
 
     public synchronized long getLastValueAndReset() {
-        var lastValue = this.lastValue;
-        this.lastValue = 0;
+        var value = lastValue;
+        lastValue = 0;
 
-        return lastValue;
+        return value;
     }
 
     @Override
