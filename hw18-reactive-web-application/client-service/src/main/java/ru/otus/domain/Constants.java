@@ -1,5 +1,5 @@
 package ru.otus.domain;
 
 public class Constants {
-    public static final String specialRoomId = "1480";
+    public static final String SPECIAL_ROOM_ID = "1480";
 }

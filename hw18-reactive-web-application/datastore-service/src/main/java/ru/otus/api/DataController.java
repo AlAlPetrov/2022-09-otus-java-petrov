@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 import ru.otus.service.DataStore;
 
-import static ru.otus.domain.Constants.specialRoomId;
+import static ru.otus.domain.Constants.SPECIAL_ROOM_ID;
 
 @RestController
 public class DataController {
@@ -33,7 +33,7 @@ public class DataController {
     public Mono<Long> messageFromChat(@PathVariable("roomId") String roomId,
                                       @RequestBody MessageDto messageDto) {
         var messageStr = messageDto.messageStr();
-        if (roomId.equals(specialRoomId)) {
+        if (roomId.equals(SPECIAL_ROOM_ID)) {
             return Mono.empty();
         }
 

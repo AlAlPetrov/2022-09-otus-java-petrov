@@ -16,17 +16,17 @@ import org.springframework.web.util.HtmlUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import ru.otus.domain.Message;
-import static ru.otus.domain.Constants.specialRoomId;
+import static ru.otus.domain.Constants.SPECIAL_ROOM_ID;
 
 @Controller
 public class MessageController {
     private static final Logger logger = LoggerFactory.getLogger(MessageController.class);
 
     private static final String TOPIC_TEMPLATE = "/topic/response.";
+    private static final String SPECIAL_ROOM_TOPIC = TOPIC_TEMPLATE + SPECIAL_ROOM_ID;
 
     private final WebClient datastoreClient;
     private final SimpMessagingTemplate template;
-    private static final String specialRoomTopic = TOPIC_TEMPLATE + specialRoomId;
 
     public MessageController(WebClient datastoreClient, SimpMessagingTemplate template) {
         this.datastoreClient = datastoreClient;
@@ -36,12 +36,12 @@ public class MessageController {
     @MessageMapping("/message.{roomId}")
     public void getMessage(@DestinationVariable String roomId, Message message) {
         logger.info("get message:{}, roomId:{}", message, roomId);
-        if (roomId.equals(specialRoomId)) {
+        if (roomId.equals(SPECIAL_ROOM_ID)) {
             return;
         }
         var cache = saveMessage(roomId, message);
         cache.subscribe(msgId -> logger.info("message send id:{}", msgId));
-        cache.subscribe(msgId -> template.convertAndSend(specialRoomTopic, message));
+        cache.subscribe(msgId -> template.convertAndSend(SPECIAL_ROOM_TOPIC, message));
         template.convertAndSend(String.format("%s%s", TOPIC_TEMPLATE, roomId),
                 new Message(HtmlUtils.htmlEscape(message.messageStr())));
     }
