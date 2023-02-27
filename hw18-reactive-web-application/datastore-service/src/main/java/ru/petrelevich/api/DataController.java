@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 import ru.petrelevich.service.DataStore;
 
+import static ru.petrelevich.domain.Constants.specialRoomId;
+
 @RestController
 public class DataController {
     private static final Logger log = LoggerFactory.getLogger(DataController.class);
@@ -31,6 +33,9 @@ public class DataController {
     public Mono<Long> messageFromChat(@PathVariable("roomId") String roomId,
                                       @RequestBody MessageDto messageDto) {
         var messageStr = messageDto.messageStr();
+        if (roomId.equals(specialRoomId)) {
+            return Mono.empty();
+        }
 
         var msgId = Mono.just(new Message(roomId, messageStr))
                 .doOnNext(msg -> log.info("messageFromChat:{}", msg))

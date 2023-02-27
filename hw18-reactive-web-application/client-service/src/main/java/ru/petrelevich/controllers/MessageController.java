@@ -16,6 +16,7 @@ import org.springframework.web.util.HtmlUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import ru.petrelevich.domain.Message;
+import static ru.petrelevich.Constants.specialRoomId;
 
 @Controller
 public class MessageController {
@@ -25,6 +26,7 @@ public class MessageController {
 
     private final WebClient datastoreClient;
     private final SimpMessagingTemplate template;
+    private static final String specialRoomTopic = TOPIC_TEMPLATE + specialRoomId;
 
     public MessageController(WebClient datastoreClient, SimpMessagingTemplate template) {
         this.datastoreClient = datastoreClient;
@@ -34,9 +36,12 @@ public class MessageController {
     @MessageMapping("/message.{roomId}")
     public void getMessage(@DestinationVariable String roomId, Message message) {
         logger.info("get message:{}, roomId:{}", message, roomId);
-        saveMessage(roomId, message)
-                .subscribe(msgId -> logger.info("message send id:{}", msgId));
-
+        if (roomId.equals(specialRoomId)) {
+            return;
+        }
+        var cache = saveMessage(roomId, message);
+        cache.subscribe(msgId -> logger.info("message send id:{}", msgId));
+        cache.subscribe(msgId -> template.convertAndSend(specialRoomTopic, message));
         template.convertAndSend(String.format("%s%s", TOPIC_TEMPLATE, roomId),
                 new Message(HtmlUtils.htmlEscape(message.messageStr())));
     }
