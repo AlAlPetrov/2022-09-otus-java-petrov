@@ -1,4 +1,4 @@
-package ru.petrelevich.controllers;
+package ru.otus.controllers;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,8 +15,8 @@ import org.springframework.web.socket.messaging.SessionSubscribeEvent;
 import org.springframework.web.util.HtmlUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import ru.petrelevich.domain.Message;
-import static ru.petrelevich.Constants.specialRoomId;
+import ru.otus.domain.Message;
+import static ru.otus.domain.Constants.specialRoomId;
 
 @Controller
 public class MessageController {
