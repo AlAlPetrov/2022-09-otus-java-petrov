@@ -16,14 +16,13 @@ import org.springframework.web.util.HtmlUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import ru.otus.domain.Message;
-import static ru.otus.domain.Constants.SPECIAL_ROOM_ID;
 
 @Controller
 public class MessageController {
     private static final Logger logger = LoggerFactory.getLogger(MessageController.class);
 
     private static final String TOPIC_TEMPLATE = "/topic/response.";
-    private static final String SPECIAL_ROOM_TOPIC = TOPIC_TEMPLATE + SPECIAL_ROOM_ID;
+    private static final String SPECIAL_ROOM_ID = "1480";
 
     private final WebClient datastoreClient;
     private final SimpMessagingTemplate template;
@@ -39,13 +38,10 @@ public class MessageController {
         if (roomId.equals(SPECIAL_ROOM_ID)) {
             return;
         }
-        var cache = saveMessage(roomId, message);
-        cache.subscribe(msgId -> logger.info("message send id:{}", msgId));
-        cache.subscribe(msgId -> template.convertAndSend(SPECIAL_ROOM_TOPIC, message));
-        template.convertAndSend(String.format("%s%s", TOPIC_TEMPLATE, roomId),
-                new Message(HtmlUtils.htmlEscape(message.messageStr())));
-    }
 
+        sendMessage(roomId, message);
+        sendMessage(SPECIAL_ROOM_ID, message);
+    }
 
     @EventListener
     public void handleSessionSubscribeEvent(SessionSubscribeEvent event) {
@@ -70,6 +66,14 @@ public class MessageController {
             throw new ChatException("Can not get roomId");
         }
     }
+
+    private void sendMessage(String roomId, Message message) {
+        saveMessage(roomId, message)
+                .subscribe(msgId -> logger.info("message send id:{}", msgId));
+        template.convertAndSend(String.format("%s%s", TOPIC_TEMPLATE, roomId),
+                new Message(HtmlUtils.htmlEscape(message.messageStr())));
+    }
+
 
     private Mono<Long> saveMessage(String roomId, Message message) {
         return datastoreClient.post().uri(String.format("/msg/%s", roomId))
