@@ -39,8 +39,8 @@ public class MessageController {
             return;
         }
 
-        sendMessage(roomId, message);
-        sendMessage(SPECIAL_ROOM_ID, message);
+        storeMessage(roomId, message);
+        storeMessage(SPECIAL_ROOM_ID, message);
     }
 
     @EventListener
@@ -67,7 +67,7 @@ public class MessageController {
         }
     }
 
-    private void sendMessage(String roomId, Message message) {
+    private void storeMessage(String roomId, Message message) {
         saveMessage(roomId, message)
                 .subscribe(msgId -> logger.info("message send id:{}", msgId));
         template.convertAndSend(String.format("%s%s", TOPIC_TEMPLATE, roomId),
