@@ -1,5 +1,6 @@
 package ru.otus.controllers;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -18,16 +19,16 @@ public class ClientController {
         this.clientService = clientService;
     }
     @PostMapping("/client")
-    public RedirectView saveClient(@RequestBody Client client) {
+    @ResponseStatus(value = HttpStatus.NO_CONTENT)
+    public void saveClient(@RequestBody Client client) {
         clientService.save(client);
-        return new RedirectView("/", true);
     }
 
     @GetMapping({"/"})
     public String clientsListView(Model model) {
         List<Client> clients = clientService.findAll();
         model.addAttribute("clients", clients);
+
         return "clients";
     }
-
 }
