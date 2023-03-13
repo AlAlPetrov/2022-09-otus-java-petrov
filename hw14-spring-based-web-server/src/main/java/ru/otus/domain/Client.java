@@ -1,40 +1,32 @@
-package ru.otus.model;
+package ru.otus.domain;
 
-import lombok.Data;
+import jakarta.annotation.Nonnull;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.PersistenceCreator;
+import org.springframework.data.relational.core.mapping.Table;
 
-import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
-@Entity
-@Table(name = "client")
+@Table("client")
 @Getter
 @Setter
 @NoArgsConstructor
-@Data
 public class Client implements Cloneable {
     @Id
-    @SequenceGenerator(name = "idgen", initialValue = 1, allocationSize = 1, sequenceName = "client_seq")
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "idgen")
-    @Column(name = "id")
     private Long id;
 
-    @Column(name = "name")
+    @Nonnull
     private String name;
 
-    @OneToOne(fetch = FetchType.EAGER,
-            cascade = CascadeType.ALL)
-    @JoinColumn(name = "client")
+    @Nonnull
     private Address address;
 
-    @OneToMany(fetch = FetchType.EAGER,
-            cascade = CascadeType.ALL,
-            mappedBy = "client",
-            orphanRemoval = true)
-    private List<Phone> phones;
+    @Nonnull
+    private Set<Phone> phones;
 
     public Client(String name) {
         this.id = null;
@@ -46,13 +38,13 @@ public class Client implements Cloneable {
         this.name = name;
     }
 
-    public Client(Long id, String name, Address address, List<Phone> phones) {
+    @PersistenceCreator
+    public Client(Long id, String name, Address address, Set<Phone> phones) {
         this.id = id;
         this.name = name;
         this.address = address;
-        this.phones = new ArrayList<>();
+        this.phones = new HashSet<Phone>();
         for (var phone: phones) {
-            phone.setClient(this);
             this.phones.add(phone);
         };
     }

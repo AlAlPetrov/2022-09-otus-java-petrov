@@ -1,4 +1,5 @@
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 
 <head>
     <style>
@@ -19,7 +20,7 @@
             const clientNameTextBox = document.getElementById('clientNameTextBox');
             const clientAddressTextBox = document.getElementById('clientAddressTextBox');
             const clientPhoneTextBox = document.getElementById('clientPhoneTextBox');
-            fetch('api/client/',
+            fetch('/client',
                     {
                         method: 'POST',
                         cache: 'no-cache',
@@ -42,7 +43,7 @@
                             })
                      })
                      .then(response => {
-                        window.location.href = '/clients';
+                        window.location.href = '/';
                      })
         }
     </script>
@@ -58,31 +59,27 @@
 <table style="width: 50%">
     <thead>
         <tr>
-            <td>Id</td>
-            <td>Имя</td>
-            <td>Адрес</td>
-            <td>Телефоны</td>
+            <th>Id</th>
+            <th>Имя</th>
+            <th>Адрес</th>
+            <th>Телефоны</th>
         </tr>
     </thead>
     <tbody>
-        <#list clients as client>
-        <tr>
-            <td>${client.id}</td>
-            <td>${client.name}</td>
-            <td>${client.address.street}</td>
+        <tr th:each="client : ${clients}">
+            <td th:text="${client.id}"></td>
+            <td th:text="${client.name}"></td>
+            <td th:text="${client.address.street}"></td>
             <td>
                 <table cellspacing="0" cellpadding="0">
                 <tbody>
-                <#list client.phones as phone>
-                <tr>
-                    <td>${phone.number}</td>
+                <tr th:each = "phone: ${client.phones}">
+                    <td th:text = "${phone.number}"></td>
                 </tr>
-                </#list>
                 </tbody>
                 </table>
             </td>
         </tr>
-        </#list>
     </tbody>
 </table>
 </body>
