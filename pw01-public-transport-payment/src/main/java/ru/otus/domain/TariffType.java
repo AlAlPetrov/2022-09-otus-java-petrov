@@ -5,7 +5,7 @@ import org.springframework.data.relational.core.mapping.Table;
 import org.springframework.data.annotation.PersistenceCreator;
 import reactor.util.annotation.NonNull;
 
-@Table("tariffTypes")
+@Table("tarifftypes")
 public class TariffType {
     @Id
     private final Long id;

@@ -1,19 +1,29 @@
 package ru.otus.service;
 
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
+import ru.otus.domain.Account;
+import ru.otus.domain.AccountBalance;
 import ru.otus.domain.Tariff;
 import ru.otus.domain.TariffType;
 
+import java.util.Optional;
+
 public interface DataStore {
 
-    Mono<TariffType> saveTariffType(TariffType tariffType);
+    TariffType saveTariffType(TariffType tariffType);
 
-    Mono<TariffType> loadTariffType(Long id);
+    Optional<TariffType> loadTariffType(Long id);
 
-    Mono<Tariff> saveTariff(Tariff tariffType);
+    Tariff saveTariff(Tariff tariffType);
 
-    Mono<Tariff> loadTariff(Integer id);
+    Optional<Tariff> loadTariff(Long id);
 
-    Flux<Tariff> loadTariffs();
+    Iterable<Tariff> loadTariffs();
+
+    Account saveAccount(Account account);
+
+    Optional<Account> loadAccount(Long id);
+
+    AccountBalance saveAccountBalance(AccountBalance account);
+
+    void deleteAccountBalanceById(Long accountId, Long id);
 }

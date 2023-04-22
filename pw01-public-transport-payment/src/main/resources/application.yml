@@ -2,8 +2,8 @@ server:
   port: 8081
 
 spring:
-  r2dbc:
-    url: r2dbc:postgresql://localhost:5430/demoDB
+  datasource:
+    url: jdbc:postgresql://localhost:5430/demoDB
     username: usr
     password: pwd
   flyway:

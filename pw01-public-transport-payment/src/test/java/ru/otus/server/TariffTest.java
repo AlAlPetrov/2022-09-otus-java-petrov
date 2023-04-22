@@ -4,26 +4,24 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
-import reactor.test.StepVerifier;
+import ru.otus.api.ResourceNotFoundException;
 import ru.otus.api.TariffController;
 import ru.otus.domain.Tariff;
-import ru.otus.domain.TariffDto;
+import ru.otus.domain.TariffRequest;
 import ru.otus.service.DataStore;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 
 @DisplayName("Tariff controller tests")
 class TariffTest {
-    class SavedTariff extends Tariff {
+    static class SavedTariff extends Tariff {
         protected SavedTariff(Long id, Tariff tariff) {
             super(id,
                     tariff.getType(),
@@ -34,94 +32,77 @@ class TariffTest {
     }
 
     @BeforeAll
-    static void setUp() throws Exception {
+    static void setUp() {
     }
 
     @AfterAll
-    static void tearDown() throws Exception {
+    static void tearDown() {
     }
 
-    @DisplayName("Get tariff returns tariff from db")
+    @DisplayName("Get tariff with existing id returns tariff")
     @Test
-    void getTariffReturnsTariffFromDb() throws Exception {
+    void getTariffWithExistingIdReturnsTariff() {
         //arrange
         var dataStore = mock(DataStore.class);
-        var pool = Schedulers.newParallel("test-pool", 1);
-        var tariffController = new TariffController(dataStore, pool);
-        var tariff = new Tariff(1L, "test tariff", 123L, 321L);
-        given(dataStore.loadTariff(anyInt())).willReturn(Mono.just(tariff));
+        var tariffController = new TariffController(dataStore);
+        var tariffFromDb = new Tariff(1L, "test tariff", 123L, 321L);
+        given(dataStore.loadTariff(anyLong())).willReturn(Optional.of(tariffFromDb));
 
         //act
-        var tariffStream = tariffController.getTariffById(1);
+        var tariff = tariffController.getTariffById(1L);
 
         //assert
-        StepVerifier
-                .create(tariffStream)
-                .consumeNextWith(tariffDto -> {
-                    assertThat(tariffDto.type()).isEqualTo(tariff.getType());
-                    assertThat(tariffDto.name()).isEqualTo(tariff.getName());
-                    assertThat(tariffDto.price()).isEqualTo(tariff.getPrice());
-                    assertThat(tariffDto.initialValue()).isEqualTo(tariff.getInitialValue());
-                })
-                .verifyComplete();
+        assertThat(tariff).isEqualTo(tariffFromDb);
+    }
+
+    @DisplayName("Get tariff with non-existent id throws ResourceNotFound exception")
+    @Test
+    void getTariffWithNonExistentIdThrows() {
+        //arrange
+        var dataStore = mock(DataStore.class);
+        var tariffController = new TariffController(dataStore);
+        given(dataStore.loadTariff(anyLong())).willReturn(Optional.empty());
+
+        //assert
+        assertThatThrownBy(()-> tariffController.getTariffById(1L))
+                .isInstanceOf(ResourceNotFoundException.class);
     }
 
     @DisplayName("Get all tariffs returns all tariffs from db")
     @Test
-    void getAllTariffsReturnsAllTariffsFromDb() throws Exception {
+    void getAllTariffsReturnsAllTariffsFromDb() {
         //arrange
         var dataStore = mock(DataStore.class);
-        var pool = Schedulers.newParallel("test-pool", 1);
-        var tariffController = new TariffController(dataStore, pool);
-        var tariffs = List.of(
+        var tariffController = new TariffController(dataStore);
+        var tariffFromDb = List.of(
                 new Tariff(1L, "test tariff", 123L, 321L),
                 new Tariff(1L, "test tariff", 123L, 321L));
 
-        given(dataStore.loadTariffs()).willReturn(Flux.fromIterable(tariffs));
+        given(dataStore.loadTariffs()).willReturn(tariffFromDb);
 
         //act
-        var tariffStream = tariffController.getTariffById();
+        var tariffs = tariffController.getTariffs();
 
         //assert
-        StepVerifier
-                .create(tariffStream)
-                .consumeNextWith(tariffDto -> {
-                    assertThat(tariffDto.type()).isEqualTo(tariffs.get(0).getType());
-                    assertThat(tariffDto.name()).isEqualTo(tariffs.get(0).getName());
-                    assertThat(tariffDto.price()).isEqualTo(tariffs.get(0).getPrice());
-                    assertThat(tariffDto.initialValue()).isEqualTo(tariffs.get(0).getInitialValue());
-                })
-                .consumeNextWith(tariffDto -> {
-                    assertThat(tariffDto.type()).isEqualTo(tariffs.get(1).getType());
-                    assertThat(tariffDto.name()).isEqualTo(tariffs.get(1).getName());
-                    assertThat(tariffDto.price()).isEqualTo(tariffs.get(1).getPrice());
-                    assertThat(tariffDto.initialValue()).isEqualTo(tariffs.get(1).getInitialValue());
-                })
-                .verifyComplete();
+        assertThat(tariffs).containsExactlyInAnyOrderElementsOf(tariffFromDb);
     }
 
     @DisplayName("Save tariff saves tariff to db and returns id")
     @Test
-    void saveTariffSavesTariffToDbAndReturnsId() throws Exception {
+    void saveTariffSavesTariffToDbAndReturnsSavedTariff() {
         //arrange
         var savedTariffId = 123L;
-        var receivedTariff = new TariffDto(132L, "test tariff", 321L, 456L);
-        var tariff = new Tariff(1L, "test tariff", 123L, 321L);
-        var savedTariff = new SavedTariff(savedTariffId, tariff);
+        var receivedTariff = new TariffRequest(132L, "test tariff", 321L, 456L);
+        var savedTariff = new SavedTariff(savedTariffId,
+                new Tariff(1L, "test tariff", 123L, 321L));
         var dataStore = mock(DataStore.class);
-        var pool = Schedulers.newParallel("test-pool", 1);
-        var tariffController = new TariffController(dataStore, pool);
-        given(dataStore.saveTariff(any(Tariff.class))).willReturn(Mono.just(savedTariff));
+        var tariffController = new TariffController(dataStore);
+        given(dataStore.saveTariff(any(Tariff.class))).willReturn(savedTariff);
 
         //act
-        var tariffStream = tariffController.createTariff(receivedTariff);
+        var tariff = tariffController.createTariff(receivedTariff);
 
         //assert
-        StepVerifier
-                .create(tariffStream)
-                .consumeNextWith(tariffId -> {
-                    assertThat(tariffId).isEqualTo(savedTariffId);
-                })
-                .verifyComplete();
+        assertThat(tariff).isEqualTo(savedTariff);
     }
 }
