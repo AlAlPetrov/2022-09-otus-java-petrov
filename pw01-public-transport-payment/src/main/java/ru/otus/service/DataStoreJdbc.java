@@ -3,9 +3,7 @@ package ru.otus.service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import reactor.core.scheduler.Scheduler;
 import ru.otus.domain.*;
-import ru.otus.repository.AccountBalanceRepository;
 import ru.otus.repository.AccountRepository;
 import ru.otus.repository.TariffRepository;
 import ru.otus.repository.TariffTypeRepository;
@@ -18,19 +16,13 @@ public class DataStoreJdbc implements DataStore {
     private final TariffTypeRepository tariffTypeRepository;
     private final TariffRepository tariffRepository;
     private final AccountRepository accountRepository;
-    private final AccountBalanceRepository accountBalanceRepository;
-    private final Scheduler workerPool;
 
-    public DataStoreJdbc(Scheduler workerPool,
-                         TariffTypeRepository tariffTypeRepository,
+    public DataStoreJdbc(TariffTypeRepository tariffTypeRepository,
                          TariffRepository tariffRepository,
-                         AccountRepository accountRepository,
-                         AccountBalanceRepository accountBalanceRepository) {
-        this.workerPool = workerPool;
+                         AccountRepository accountRepository) {
         this.tariffTypeRepository = tariffTypeRepository;
         this.tariffRepository = tariffRepository;
         this.accountRepository = accountRepository;
-        this.accountBalanceRepository = accountBalanceRepository;
     }
 
     @Override
@@ -73,15 +65,5 @@ public class DataStoreJdbc implements DataStore {
     public Optional<Account> loadAccount(Long id) {
         log.debug("loadAccount id:{}", id);
         return accountRepository.findById(id);
-    }
-
-    @Override
-    public AccountBalance saveAccountBalance(AccountBalance accountBalance) {
-        return accountBalanceRepository.save(accountBalance);
-    }
-
-    @Override
-    public void deleteAccountBalanceById(Long accountId, Long id) {
-        accountBalanceRepository.deleteAccountBalanceById(accountId, id);
     }
 }

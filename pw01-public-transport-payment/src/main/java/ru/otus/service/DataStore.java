@@ -22,8 +22,4 @@ public interface DataStore {
     Account saveAccount(Account account);
 
     Optional<Account> loadAccount(Long id);
-
-    AccountBalance saveAccountBalance(AccountBalance account);
-
-    void deleteAccountBalanceById(Long accountId, Long id);
 }

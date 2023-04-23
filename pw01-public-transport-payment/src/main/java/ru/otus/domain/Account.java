@@ -18,7 +18,6 @@ public class Account {
     private final Long id;
     @NonNull
     private final String cardNumber;
-    //@Column("account")
     @MappedCollection(idColumn = "account")
     private final Set<AccountBalance> accountBalances;
 
@@ -29,9 +28,7 @@ public class Account {
         this.id = id;
         this.cardNumber = cardNumber;
         this.accountBalances = new HashSet<>();
-        for (var accountBalance: accountBalances) {
-            this.accountBalances.add(accountBalance);
-        };
+        this.accountBalances.addAll(accountBalances);
     }
 
     public Account(@NonNull String cardNumber,
@@ -42,6 +39,11 @@ public class Account {
     public void addBalance(AccountBalance accountBalance) {
         accountBalances.add(accountBalance);
     }
+
+    public void removeBalance(Long id) {
+        accountBalances.removeIf((balance) -> balance.getId() == id);
+    }
+
     public static Account fromRequest(AccountRequest accountRequest) {
         var balances = new HashSet<AccountBalance>();
         for (var accountBalance: accountRequest.balances()) {

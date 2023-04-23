@@ -147,16 +147,26 @@ class AccountTest {
 
     @DisplayName("Delete account balance to existing account deletes account balance")
     @Test
-    void deleteBalanceOfExistingAccountDeletesBalance() {
+    void deleteBalanceOfExistingAccountSavesAccount() {
         //arrange
         var dataStore = mock(DataStore.class);
         var accountController = new AccountController(dataStore);
-
+        var savedAccount = makeValidAccount();
+        given(dataStore.loadAccount(anyLong())).willReturn(Optional.of(savedAccount));
+        var existingBalanceId = savedAccount.getAccountBalances().stream()
+                .findFirst()
+                .get()
+                .getId();
         //act
-        accountController.deleteAccountBalance(anyLong(), anyLong());
+        accountController.deleteAccountBalance(anyLong(), existingBalanceId);
 
         //assert
-        verify(dataStore, times(1))
-                .deleteAccountBalanceById(anyLong(), anyLong());
+        verify(dataStore)
+                .saveAccount(argThat(account ->
+                        account.getAccountBalances()
+                                .stream()
+                                .filter(balance -> balance.getId() == existingBalanceId)
+                                .findAny()
+                                .isEmpty()));
     }
 }

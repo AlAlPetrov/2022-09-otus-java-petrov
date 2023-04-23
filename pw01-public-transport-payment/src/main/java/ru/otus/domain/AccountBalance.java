@@ -47,14 +47,6 @@ public class AccountBalance {
                 accountBalanceRequest.reservedValue());
     }
 
-    public static AccountBalance fromRequest(Long accountId,
-                                             AccountBalanceRequest accountBalanceRequest) {
-        return new AccountBalance(accountId,
-                accountBalanceRequest.tariff(),
-                accountBalanceRequest.remainingValue(),
-                accountBalanceRequest.reservedValue());
-    }
-
     @Override
     public String toString() {
         return "AccountBalance{" +

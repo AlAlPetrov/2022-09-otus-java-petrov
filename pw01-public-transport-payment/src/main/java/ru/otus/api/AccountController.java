@@ -12,6 +12,7 @@ import ru.otus.domain.AccountRequest;
 import ru.otus.service.DataStore;
 
 @RestController
+@RequestMapping("/api/v1/account")
 public class AccountController {
     private static final Logger log = LoggerFactory.getLogger(AccountController.class);
     private final DataStore dataStore;
@@ -20,20 +21,20 @@ public class AccountController {
         this.dataStore = dataStore;
     }
 
-    @PostMapping(value = "/account")
+    @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
     public Account createAccount(@RequestBody AccountRequest accountRequest) {
         return dataStore.saveAccount(Account.fromRequest(accountRequest));
     }
 
-    @GetMapping(value = "/account/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public Account getAccountById(@PathVariable("id") Long id) {
         return  dataStore
                 .loadAccount(id)
                 .orElseThrow(ResourceNotFoundException::new);
     }
 
-    @PostMapping(value = "/account/{id}/balance")
+    @PostMapping(value = "/{id}/balance")
     @ResponseStatus( HttpStatus.CREATED )
     public Account addBalanceToAccount(@PathVariable("id") Long id,
                                        @RequestBody AccountBalanceRequest accountBalanceRequest) {
@@ -45,11 +46,16 @@ public class AccountController {
         return dataStore.saveAccount(account);
     }
 
-    @DeleteMapping(value = "/account/{accountId}/balance/{id}")
+    @DeleteMapping(value = "/{accountId}/balance/{id}")
     @ResponseStatus( HttpStatus.NO_CONTENT )
     public void deleteAccountBalance(@PathVariable("accountId") Long accountId,
                                              @PathVariable("id") Long id) {
-        dataStore.deleteAccountBalanceById(accountId, id);
+        var account = dataStore
+                .loadAccount(accountId)
+                .orElseThrow(ResourceNotFoundException::new);
+
+        account.removeBalance(id);
+        dataStore.saveAccount(account);
     }
 
 }

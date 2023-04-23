@@ -8,6 +8,7 @@ import ru.otus.domain.TariffTypeRequest;
 import ru.otus.service.DataStore;
 
 @RestController
+@RequestMapping("/api/v1/tariffType")
 public class TariffTypeController {
     private final DataStore dataStore;
 
@@ -15,13 +16,13 @@ public class TariffTypeController {
         this.dataStore = dataStore;
     }
 
-    @PostMapping(value = "/tariffType")
+    @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
     public TariffType createTariffType(@RequestBody TariffTypeRequest tariffTypeRequest) {
         return dataStore.saveTariffType(new TariffType(tariffTypeRequest.name()));
     }
 
-    @GetMapping(value = "/tariffType/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public TariffType getTariffTypeById(@PathVariable("id") Long id) {
         return  dataStore
                 .loadTariffType(id)

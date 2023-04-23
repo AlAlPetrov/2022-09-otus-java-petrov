@@ -8,6 +8,7 @@ import ru.otus.domain.TariffRequest;
 import ru.otus.service.DataStore;
 
 @RestController
+@RequestMapping("/api/v1/tariff")
 public class TariffController {
     private final DataStore dataStore;
 
@@ -15,7 +16,7 @@ public class TariffController {
         this.dataStore = dataStore;
     }
 
-    @PostMapping(value = "/tariff")
+    @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
     public Tariff createTariff(@RequestBody TariffRequest tariffRequest) {
         return dataStore.saveTariff(new Tariff(tariffRequest.type(),
@@ -24,14 +25,14 @@ public class TariffController {
                         tariffRequest.initialValue()));
     }
 
-    @GetMapping(value = "/tariff/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public Tariff getTariffById(@PathVariable("id") Long id) {
         return dataStore
                 .loadTariff(id)
                 .orElseThrow(ResourceNotFoundException::new);
     }
 
-    @GetMapping(value = "/tariff", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public Iterable<Tariff> getTariffs() {
         return dataStore.loadTariffs();
     }
