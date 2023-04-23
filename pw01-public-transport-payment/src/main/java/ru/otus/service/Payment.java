@@ -5,6 +5,6 @@ import ru.otus.domain.Account;
 import ru.otus.domain.PaymentRequest;
 
 @Service
-public interface TopUp {
-    Account topUpAccount(PaymentRequest paymentRequest);
+public interface Payment {
+    Account writeOff(PaymentRequest paymentRequest);
 }

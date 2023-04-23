@@ -2,24 +2,25 @@ package ru.otus.server;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import ru.otus.domain.*;
+import ru.otus.domain.Account;
+import ru.otus.domain.AccountBalance;
+import ru.otus.domain.BlackList;
+import ru.otus.domain.PaymentRequest;
 import ru.otus.exception.BadRequestException;
 import ru.otus.service.DataStore;
-import ru.otus.service.TopUpJdbc;
+import ru.otus.service.PaymentJdbc;
 
 import java.util.Optional;
 import java.util.Set;
 
 import static java.util.UUID.randomUUID;
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
-@DisplayName("TopUp service tests")
-class TopUpServiceTest {
+@DisplayName("Payment service tests")
+class PaymentServiceTest {
     static class SavedAccountBalance extends AccountBalance {
         protected SavedAccountBalance(Long id, AccountBalance accountBalance) {
             super(id,
@@ -41,101 +42,104 @@ class TopUpServiceTest {
         return new SavedAccount(1L,
                 new Account(randomUUID().toString(),
                         Set.of(new SavedAccountBalance(1L, new AccountBalance(1L,
-                                        10012L,
+                                        0L,
                                         20045L)),
                                 new SavedAccountBalance(2L, new AccountBalance(2L,
                                         30012L,
                                         40045L)))));
     }
 
-    @DisplayName("TopUp with happy path adds value to the balance")
+    @DisplayName("WriteOff with happy path reduces balance value")
     @Test
-    void topUpAccountWithHappyPathAddsValueToTheBalance() {
+    void writeOffAccountWithHappyPathReducesBalanceValue() {
         //arrange
         var value = 10032L;
         var dataStore = mock(DataStore.class);
-        var topUpService = new TopUpJdbc(dataStore);
+        var paymentJdbc = new PaymentJdbc(dataStore);
         var accountFromDb = makeValidAccount();
         given(dataStore.loadAccount(anyLong())).willReturn(Optional.of(accountFromDb));
-        var balanceBeforeTopUp = (AccountBalance)
-                accountFromDb.getAccountBalances().stream()
+        var accountBalance = accountFromDb.getAccountBalances().stream()
                 .findFirst()
-                .get()
+                .get();
+        accountBalance.topUp(value);
+        var balanceBeforeTopUp = (AccountBalance)
+                accountBalance
                 .clone();
-        var topUpRequest = new PaymentRequest(accountFromDb.getId(),
+        var request = new PaymentRequest(accountFromDb.getId(),
                 balanceBeforeTopUp.getTariff(),
                 value);
+
         //act
-        topUpService.topUpAccount(topUpRequest);
+        paymentJdbc.writeOff(request);
 
         //assert
         verify(dataStore).saveAccount(argThat(savedAccount -> savedAccount.getAccountBalances().stream()
                 .filter(balance -> balance.getTariff() == balanceBeforeTopUp.getTariff())
                 .findFirst()
-                .get().getRemainingValue() == (balanceBeforeTopUp.getRemainingValue() + value)));
+                .get().getRemainingValue() == (balanceBeforeTopUp.getRemainingValue() - value)));
     }
 
-    @DisplayName("TopUp account with non-existent account throws BadRequest exception")
+    @DisplayName("WriteOff account with non-existent account throws BadRequest exception")
     @Test
-    void topUpAccountWithNonExistentAccountThrows() {
+    void writeOffAccountWithNonExistentAccountThrows() {
         //arrange
         var dataStore = mock(DataStore.class);
-        var topUpService = new TopUpJdbc(dataStore);
+        var paymentJdbc = new PaymentJdbc(dataStore);
         given(dataStore.loadAccount(anyLong())).willReturn(Optional.empty());
-        var topUpRequest = new PaymentRequest(1L,
+        var request = new PaymentRequest(1L,
                 2L,
                 3L);
 
         //assert
-        assertThatThrownBy(() -> topUpService.topUpAccount(topUpRequest))
+        assertThatThrownBy(() -> paymentJdbc.writeOff(request))
                 .isInstanceOf(BadRequestException.class);
     }
 
-    @DisplayName("TopUp account with non-existent balance throws BadRequest exception")
+    @DisplayName("WriteOff account with non-existent balance throws BadRequest exception")
     @Test
-    void topUpAccountWithNonExistentBalanceThrows() {
+    void writeOffAccountWithNonExistentBalanceThrows() {
         //arrange
         var dataStore = mock(DataStore.class);
-        var topUpService = new TopUpJdbc(dataStore);
+        var paymentJdbc = new PaymentJdbc(dataStore);
         given(dataStore.loadAccount(anyLong())).willReturn(Optional.empty());
         var accountFromDb = makeValidAccount();
         given(dataStore.loadAccount(anyLong())).willReturn(Optional.of(accountFromDb));
-        var topUpRequest = new PaymentRequest(1L,
+        var request = new PaymentRequest(1L,
                 1002L,
                 3L);
 
         //assert
-        assertThatThrownBy(() -> topUpService.topUpAccount(topUpRequest))
+        assertThatThrownBy(() -> paymentJdbc.writeOff(request))
                 .isInstanceOf(BadRequestException.class);
     }
 
-    @DisplayName("TopUp account with account in black list throws BadRequest exception")
+    @DisplayName("WriteOff account with account in black list throws BadRequest exception")
     @Test
-    void topUpAccountWithAccountInBlackListThrows() {
+    void writeOffAccountWithAccountInBlackListThrows() {
         //arrange
         var dataStore = mock(DataStore.class);
-        var topUpService = new TopUpJdbc(dataStore);
+        var paymentJdbc = new PaymentJdbc(dataStore);
         var blackListItem = new BlackList(1L, "test reason");
         given(dataStore.loadAccount(anyLong())).willReturn(Optional.empty());
         var accountFromDb = makeValidAccount();
         given(dataStore.loadAccount(anyLong())).willReturn(Optional.of(accountFromDb));
         given(dataStore.loadBlackList(anyLong())).willReturn(Optional.of(blackListItem));
-        var topUpRequest = new PaymentRequest(1L,
+        var request = new PaymentRequest(1L,
                 1002L,
                 3L);
 
         //assert
-        assertThatThrownBy(() -> topUpService.topUpAccount(topUpRequest))
+        assertThatThrownBy(() -> paymentJdbc.writeOff(request))
                 .isInstanceOf(BadRequestException.class);
     }
 
-    @DisplayName("TopUp with several balances throws BadRequest exception")
+    @DisplayName("WriteOff with several balances throws BadRequest exception")
     @Test
-    void topUpAccountWithSeveralBalancesThrows() {
+    void writeOffAccountWithSeveralBalancesThrows() {
         //arrange
         var value = 10032L;
         var dataStore = mock(DataStore.class);
-        var topUpService = new TopUpJdbc(dataStore);
+        var paymentJdbc = new PaymentJdbc(dataStore);
         var accountFromDb = makeValidAccount();
         given(dataStore.loadAccount(anyLong())).willReturn(Optional.of(accountFromDb));
         var balanceBeforeTopUp = (AccountBalance)
@@ -144,12 +148,37 @@ class TopUpServiceTest {
                         .get()
                         .clone();
         accountFromDb.addBalance(balanceBeforeTopUp);
-        var topUpRequest = new PaymentRequest(accountFromDb.getId(),
+        var request = new PaymentRequest(accountFromDb.getId(),
                 balanceBeforeTopUp.getTariff(),
                 value);
 
         //assert
-        assertThatThrownBy(() -> topUpService.topUpAccount(topUpRequest))
+        assertThatThrownBy(() -> paymentJdbc.writeOff(request))
+                .isInstanceOf(BadRequestException.class);
+    }
+
+    @DisplayName("WriteOff with not enough funds throws BadRequest exception")
+    @Test
+    void writeOffAccountWithNotEnoughFundsThrows() {
+        //arrange
+        var value = 10032L;
+        var dataStore = mock(DataStore.class);
+        var paymentJdbc = new PaymentJdbc(dataStore);
+        var accountFromDb = makeValidAccount();
+        given(dataStore.loadAccount(anyLong())).willReturn(Optional.of(accountFromDb));
+        var accountBalance = accountFromDb.getAccountBalances().stream()
+                .findFirst()
+                .get();
+        accountBalance.topUp(value - 1);
+        var balanceBeforeTopUp = (AccountBalance)
+                accountBalance
+                        .clone();
+        var request = new PaymentRequest(accountFromDb.getId(),
+                balanceBeforeTopUp.getTariff(),
+                value);
+
+        //assert
+        assertThatThrownBy(() -> paymentJdbc.writeOff(request))
                 .isInstanceOf(BadRequestException.class);
     }
 }

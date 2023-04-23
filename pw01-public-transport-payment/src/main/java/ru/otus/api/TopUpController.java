@@ -19,7 +19,7 @@ public class TopUpController {
 
     @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
-    public Account topUpAccount(@RequestBody TopUpRequest topUpRequest) {
-        return topUpJdbc.topUpAccount(topUpRequest);
+    public Account topUpAccount(@RequestBody PaymentRequest paymentRequest) {
+        return topUpJdbc.topUpAccount(paymentRequest);
     }
 }

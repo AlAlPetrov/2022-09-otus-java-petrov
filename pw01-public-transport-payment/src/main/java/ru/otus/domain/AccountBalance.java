@@ -48,6 +48,13 @@ public class AccountBalance implements Cloneable {
         remainingValue += value;
     }
 
+    public void writeOff(Long value) {
+        if (remainingValue < value) {
+            throw new RuntimeException("Not enough funds");
+        }
+        remainingValue -= value;
+    }
+
     @Override
     public String toString() {
         return "AccountBalance{" +
@@ -61,4 +68,5 @@ public class AccountBalance implements Cloneable {
                 this.remainingValue,
                 this.reservedValue);
     }
+
 }

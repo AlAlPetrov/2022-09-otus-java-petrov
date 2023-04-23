@@ -3,27 +3,28 @@ package ru.otus.service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import ru.otus.domain.*;
+import ru.otus.domain.Account;
+import ru.otus.domain.PaymentRequest;
 import ru.otus.exception.BadRequestException;
 
 import java.util.stream.Collectors;
 
 @Service
-public class TopUpJdbc implements TopUp {
-    private static final Logger log = LoggerFactory.getLogger(TopUpJdbc.class);
+public class PaymentJdbc implements Payment {
+    private static final Logger log = LoggerFactory.getLogger(PaymentJdbc.class);
     private final DataStore dataStore;
 
-    public TopUpJdbc(DataStore dataStore) {
+    public PaymentJdbc(DataStore dataStore) {
         this.dataStore = dataStore;
     }
 
     @Override
-    public Account topUpAccount(PaymentRequest paymentRequest) {
+    public Account writeOff(PaymentRequest paymentRequest) {
         var account = dataStore
                 .loadAccount(paymentRequest.accountId())
                 .orElseThrow(() -> new BadRequestException("Account with id " +
-                paymentRequest.accountId() +
-                " not found"));
+                        paymentRequest.accountId() +
+                        " not found"));
 
         var isInBlackList = dataStore
                 .loadBlackList(paymentRequest.accountId())
@@ -48,7 +49,13 @@ public class TopUpJdbc implements TopUp {
                     paymentRequest.tariffId() +
                     " found");
         }
-        balanceToTopUp.get(0).topUp(paymentRequest.value());
+
+        if (balanceToTopUp.get(0).getRemainingValue() < paymentRequest.value()) {
+            throw new BadRequestException("Not enough funds on balance " +
+                    paymentRequest.tariffId() +
+                    " to complete the payment ");
+        }
+        balanceToTopUp.get(0).writeOff(paymentRequest.value());
 
         return dataStore.saveAccount(account);
     }
