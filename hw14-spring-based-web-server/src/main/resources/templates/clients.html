@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <style>
+        table, td, th {
+          border: 1px solid black;
+          border-collapse: collapse;
+        }
+
+        tr td:last-child {
+            width: 1%;
+            white-space: nowrap;
+        }
+    </style>
+
+    <title>Пользователи</title>
+    <script>
+        function addClient() {
+            const clientNameTextBox = document.getElementById('clientNameTextBox');
+            const clientAddressTextBox = document.getElementById('clientAddressTextBox');
+            const clientPhoneTextBox = document.getElementById('clientPhoneTextBox');
+            fetch('/client',
+                    {
+                        method: 'POST',
+                        cache: 'no-cache',
+                        redirect: 'follow',
+                        window: window,
+                        headers: {
+                          'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(
+                            {
+                                "name": clientNameTextBox.value,
+                                "address": {
+                                    "street": clientAddressTextBox.value
+                                },
+                                "phones": [
+                                    {
+                                        "number": clientPhoneTextBox.value
+                                    }
+                                ]
+                            })
+                     })
+                     .then(response => {
+                        window.location.href = '/';
+                     })
+        }
+    </script>
+</head>
+
+<body>
+<input type="text" id = "clientNameTextBox" value="test client" placeholder="Введите имя клиента">
+<input type="text" id = "clientAddressTextBox" value="test street" placeholder="Введите адрес клиента">
+<input type="text" id = "clientPhoneTextBox" value="+7(123)4567890" placeholder="Введите телефон клиента">
+<button onclick="addClient()">Создать клиента</button>
+
+<h4>Клиенты:</h4>
+<table style="width: 50%">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Имя</th>
+            <th>Адрес</th>
+            <th>Телефоны</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr th:each="client : ${clients}">
+            <td th:text="${client.id}"></td>
+            <td th:text="${client.name}"></td>
+            <td th:text="${client.address.street}"></td>
+            <td>
+                <table cellspacing="0" cellpadding="0">
+                <tbody>
+                <tr th:each = "phone: ${client.phones}">
+                    <td th:text = "${phone.number}"></td>
+                </tr>
+                </tbody>
+                </table>
+            </td>
+        </tr>
+    </tbody>
+</table>
+</body>
+</html>
