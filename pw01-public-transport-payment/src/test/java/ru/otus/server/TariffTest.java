@@ -1,7 +1,5 @@
 package ru.otus.server;
 
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import ru.otus.api.ResourceNotFoundException;
@@ -29,14 +27,6 @@ class TariffTest {
                     tariff.getPrice(),
                     tariff.getInitialValue());
         }
-    }
-
-    @BeforeAll
-    static void setUp() {
-    }
-
-    @AfterAll
-    static void tearDown() {
     }
 
     @DisplayName("Get tariff with existing id returns tariff")

@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import ru.otus.domain.*;
 import ru.otus.repository.AccountRepository;
+import ru.otus.repository.BlackListRepository;
 import ru.otus.repository.TariffRepository;
 import ru.otus.repository.TariffTypeRepository;
 
@@ -16,13 +17,16 @@ public class DataStoreJdbc implements DataStore {
     private final TariffTypeRepository tariffTypeRepository;
     private final TariffRepository tariffRepository;
     private final AccountRepository accountRepository;
+    private final BlackListRepository blackListRepository;
 
     public DataStoreJdbc(TariffTypeRepository tariffTypeRepository,
                          TariffRepository tariffRepository,
-                         AccountRepository accountRepository) {
+                         AccountRepository accountRepository,
+                         BlackListRepository blackListRepository) {
         this.tariffTypeRepository = tariffTypeRepository;
         this.tariffRepository = tariffRepository;
         this.accountRepository = accountRepository;
+        this.blackListRepository = blackListRepository;
     }
 
     @Override
@@ -65,5 +69,20 @@ public class DataStoreJdbc implements DataStore {
     public Optional<Account> loadAccount(Long id) {
         log.debug("loadAccount id:{}", id);
         return accountRepository.findById(id);
+    }
+
+    @Override
+    public Optional<BlackList> loadBlackList(Long accountId) {
+        return blackListRepository.findByAccountId(accountId);
+    }
+
+    @Override
+    public BlackList saveBlackList(BlackList blackList) {
+        return blackListRepository.save(blackList);
+    }
+
+    @Override
+    public void deleteBlackList(Long accountId) {
+        blackListRepository.deleteByAccountId(accountId);
     }
 }

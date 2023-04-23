@@ -1,9 +1,6 @@
 package ru.otus.service;
 
-import ru.otus.domain.Account;
-import ru.otus.domain.AccountBalance;
-import ru.otus.domain.Tariff;
-import ru.otus.domain.TariffType;
+import ru.otus.domain.*;
 
 import java.util.Optional;
 
@@ -22,4 +19,10 @@ public interface DataStore {
     Account saveAccount(Account account);
 
     Optional<Account> loadAccount(Long id);
+
+    Optional<BlackList> loadBlackList(Long accountId);
+
+    BlackList saveBlackList(BlackList blackList);
+
+    void deleteBlackList(Long accountId);
 }

@@ -1,7 +1,5 @@
 package ru.otus.server;
 
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import ru.otus.api.AccountController;
@@ -49,14 +47,6 @@ class AccountTest {
                                 new SavedAccountBalance(2L, new AccountBalance(2L,
                                         30012L,
                                         40045L)))));
-    }
-
-    @BeforeAll
-    static void setUp() {
-    }
-
-    @AfterAll
-    static void tearDown() {
     }
 
     @DisplayName("Get account with existing id returns account")
