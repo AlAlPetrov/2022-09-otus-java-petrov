@@ -3,15 +3,12 @@ package ru.otus.domain;
 import lombok.Getter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.PersistenceCreator;
-import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 import reactor.util.annotation.NonNull;
 
-import java.util.HashSet;
-
 @Getter
 @Table("accountbalances")
-public class AccountBalance {
+public class AccountBalance implements Cloneable {
     @Id
     private final Long id;
 
@@ -23,6 +20,12 @@ public class AccountBalance {
 
     @NonNull
     Long reservedValue;
+
+    public static AccountBalance fromRequest(AccountBalanceRequest accountBalanceRequest) {
+        return new AccountBalance(accountBalanceRequest.tariff(),
+                accountBalanceRequest.remainingValue(),
+                accountBalanceRequest.reservedValue());
+    }
 
     @PersistenceCreator
     protected AccountBalance(Long id,
@@ -41,10 +44,8 @@ public class AccountBalance {
         this(null, tariff, remainingValue, reservedValue);
     }
 
-    public static AccountBalance fromRequest(AccountBalanceRequest accountBalanceRequest) {
-        return new AccountBalance(accountBalanceRequest.tariff(),
-                accountBalanceRequest.remainingValue(),
-                accountBalanceRequest.reservedValue());
+    public void topUp(Long value) {
+        remainingValue += value;
     }
 
     @Override
@@ -52,5 +53,12 @@ public class AccountBalance {
         return "AccountBalance{" +
                 "id=" + id +
                 '}';
+    }
+
+    public Object clone() {
+        return new AccountBalance(this.id,
+                this.tariff,
+                this.remainingValue,
+                this.reservedValue);
     }
 }

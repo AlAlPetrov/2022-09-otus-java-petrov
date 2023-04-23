@@ -5,6 +5,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import ru.otus.domain.Tariff;
 import ru.otus.domain.TariffRequest;
+import ru.otus.exception.ResourceNotFoundException;
 import ru.otus.service.DataStore;
 
 @RestController

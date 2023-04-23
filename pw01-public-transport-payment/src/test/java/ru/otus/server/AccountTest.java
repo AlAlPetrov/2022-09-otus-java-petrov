@@ -3,7 +3,9 @@ package ru.otus.server;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import ru.otus.api.AccountController;
-import ru.otus.api.ResourceNotFoundException;
+import ru.otus.domain.AccountBalanceRequest;
+import ru.otus.domain.AccountRequest;
+import ru.otus.exception.ResourceNotFoundException;
 import ru.otus.domain.*;
 import ru.otus.service.DataStore;
 

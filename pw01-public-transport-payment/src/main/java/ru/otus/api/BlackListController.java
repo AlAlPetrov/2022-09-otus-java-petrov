@@ -5,6 +5,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.otus.domain.*;
+import ru.otus.domain.BlackListRequest;
+import ru.otus.exception.ResourceNotFoundException;
 import ru.otus.service.DataStore;
 
 @RestController

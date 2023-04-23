@@ -9,6 +9,7 @@ import ru.otus.domain.Account;
 import ru.otus.domain.AccountBalance;
 import ru.otus.domain.AccountBalanceRequest;
 import ru.otus.domain.AccountRequest;
+import ru.otus.exception.ResourceNotFoundException;
 import ru.otus.service.DataStore;
 
 @RestController
