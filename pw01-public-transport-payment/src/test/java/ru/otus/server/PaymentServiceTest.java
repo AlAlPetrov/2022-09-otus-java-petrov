@@ -45,7 +45,7 @@ class PaymentServiceTest {
                                         0L,
                                         20045L)),
                                 new SavedAccountBalance(2L, new AccountBalance(2L,
-                                        30012L,
+                                        0L,
                                         40045L)))));
     }
 
@@ -74,7 +74,7 @@ class PaymentServiceTest {
 
         //assert
         verify(dataStore).saveAccount(argThat(savedAccount -> savedAccount.getAccountBalances().stream()
-                .filter(balance -> balance.getTariff() == balanceBeforeTopUp.getTariff())
+                .filter(balance -> balance.getTariff().equals(balanceBeforeTopUp.getTariff()))
                 .findFirst()
                 .get().getRemainingValue() == (balanceBeforeTopUp.getRemainingValue() - value)));
     }

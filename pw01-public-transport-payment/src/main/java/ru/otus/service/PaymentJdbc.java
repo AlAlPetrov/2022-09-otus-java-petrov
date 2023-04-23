@@ -35,27 +35,28 @@ public class PaymentJdbc implements Payment {
                     " is in the black list");
         }
 
-        var balanceToTopUp = account.getAccountBalances()
+        var balanceToWriteOff = account.getAccountBalances()
                 .stream()
                 .filter(balance -> balance.getTariff() == paymentRequest.tariffId())
                 .collect(Collectors.toList());
-        if (balanceToTopUp.size() == 0) {
+        if (balanceToWriteOff.size() == 0) {
             throw new BadRequestException("No balance for the tariff " +
                     paymentRequest.tariffId() +
                     " found");
         }
-        if (balanceToTopUp.size() > 1) {
+        if (balanceToWriteOff.size() > 1) {
             throw new BadRequestException("Too many balances for the tariff " +
                     paymentRequest.tariffId() +
                     " found");
         }
 
-        if (balanceToTopUp.get(0).getRemainingValue() < paymentRequest.value()) {
+        if (balanceToWriteOff.get(0).getRemainingValue() < paymentRequest.value()) {
             throw new BadRequestException("Not enough funds on balance " +
                     paymentRequest.tariffId() +
                     " to complete the payment ");
         }
-        balanceToTopUp.get(0).writeOff(paymentRequest.value());
+
+        balanceToWriteOff.get(0).writeOff(paymentRequest.value());
 
         return dataStore.saveAccount(account);
     }
